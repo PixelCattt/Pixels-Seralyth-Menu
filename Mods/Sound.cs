@@ -1,4 +1,4 @@
-﻿/*
+/*
  * Seralyth Menu  Mods/Sound.cs
  * A community driven mod menu for Gorilla Tag with over 1000+ mods
  *

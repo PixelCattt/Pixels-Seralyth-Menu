@@ -4285,13 +4285,15 @@ namespace Seralyth.Menu
                 MonkeAgent.instance.rpcErrorMax = int.MaxValue;
                 MonkeAgent.instance.rpcCallLimit = int.MaxValue;
                 MonkeAgent.instance.logErrorMax = int.MaxValue;
-
+                MonkeAgent.instance.userRPCCalls.Clear();
+                
                 PhotonNetwork.MaxResendsBeforeDisconnect = int.MaxValue;
                 PhotonNetwork.QuickResends = int.MaxValue;
 
                 PhotonNetwork.SendAllOutgoingCommands();
             } catch { LogManager.Log("RPC protection failed, are you in a lobby?"); }
         }
+
 
         /// <summary>
         /// Returns the given URL's raw output as a string.

@@ -342,11 +342,12 @@ namespace Seralyth.Managers
 
         public static NetPlayer[] GetAllFriendsInRoom()
         {
-            return !NetworkSystem.Instance.InRoom
+            return !NetworkSystem.Instance.InRoom || instance?.Friends?.friends == null
                 ? Array.Empty<NetPlayer>()
                 : NetworkSystem.Instance.PlayerListOthers
-                .Where(player => instance.Friends.friends.Values
-                    .Any(friend => player.UserId == friend.currentUserID))
+                .Where(player => player != null && player.UserId != null &&
+                    instance.Friends.friends.Values
+                        .Any(friend => friend != null && player.UserId == friend.currentUserID))
                 .ToArray();
         }
 
