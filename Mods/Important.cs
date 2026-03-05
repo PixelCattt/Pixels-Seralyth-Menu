@@ -155,14 +155,13 @@ namespace Seralyth.Mods
                 MaxPlayers = RoomSystem.GetRoomSizeForCreate(netTrigger.zone, Enum.Parse<GameModeType>(GorillaComputer.instance.currentGameMode.Value, true), !isPublic, SubscriptionManager.IsLocalSubscribed()),
                 CustomProps = new Hashtable
                 {
-                    { "gameMode", netTrigger.GetFullDesiredGameModeString() },
                     { "platform", PhotonNetworkController.Instance.platformTag },
-                    { "queueName", GorillaComputer.instance.currentQueue },
+                    { "gameMode", netTrigger.GetFullDesiredGameModeString() },
                     { "language", LocalisationManager.CurrentLanguage.ToString() },
-                    { "fan_club", SubscriptionManager.IsLocalSubscribed() ? "true" : "false" }
+                    { "fan_club", SubscriptionManager.IsLocalSubscribed() ? "true" : "false" },
+                    { "queueName", GorillaComputer.instance.currentQueue },
                 }
             };
-
 
             PhotonNetworkController.Instance.currentJoinType = roomJoinType;
 

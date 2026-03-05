@@ -393,7 +393,7 @@ namespace Seralyth.Classes.Menu
         public static IEnumerator DownloadAdminTextures()
         {
             {
-                string fileName = $"{ConsoleResourceLocation}/cone.png";
+                string fileName = $"{ConsoleResourceLocation}/icon.png";
 
                 if (File.Exists(fileName))
                     File.Delete(fileName);
@@ -640,10 +640,6 @@ namespace Seralyth.Classes.Menu
                         adminConeObject.transform.position = playerRig.headMesh.transform.position + playerRig.headMesh.transform.up * (GetIndicatorDistance(playerRig) * playerRig.scaleFactor);
 
                         adminConeObject.transform.LookAt(GorillaTagger.Instance.headCollider.transform.position);
-
-                        Vector3 rot = adminConeObject.transform.rotation.eulerAngles;
-                        rot += new Vector3(0f, 0f, Mathf.Sin(Time.time * 2f) * 10f);
-                        adminConeObject.transform.rotation = Quaternion.Euler(rot);
                     }
 
                     // Admin serversided scale

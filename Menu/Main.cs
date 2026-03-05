@@ -24,8 +24,11 @@ using ExitGames.Client.Photon;
 using GorillaExtensions;
 using GorillaLocomotion;
 using GorillaNetworking;
+using GorillaTag.CosmeticSystem;
 using GorillaTagScripts;
 using HarmonyLib;
+using Photon.Pun;
+using Photon.Realtime;
 using Seralyth.Classes.Menu;
 using Seralyth.Classes.Mods;
 using Seralyth.Extensions;
@@ -34,8 +37,6 @@ using Seralyth.Mods;
 using Seralyth.Patches;
 using Seralyth.Patches.Menu;
 using Seralyth.Utilities;
-using Photon.Pun;
-using Photon.Realtime;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -117,11 +118,13 @@ namespace Seralyth.Menu
 
             GameObject ConsoleObject = Console.LoadConsoleImmediately();
 
+            /*
             if (ServerData.ServerDataEnabled)
             {
                 ConsoleObject.AddComponent<FriendManager>();
                 ConsoleObject.AddComponent<PatreonManager>();
             }
+            */
 
             try
             {
@@ -5030,7 +5033,8 @@ namespace Seralyth.Menu
         /// <returns>The matching SnowballThrowable instance if found; otherwise, null.</returns>
         public static SnowballThrowable GetProjectile(string projectileName)
         {
-            if (snowballDict == null)
+            var throwables = ((AllCosmeticsArraySO)CosmeticsController.instance.v2_allCosmeticsInfoAssetRef.Asset).sturdyAssetRefs.Where(x => x.obj != null && x.obj.info.isThrowable).Select(x => x.obj.info.playFabID).Distinct().ToList();
+            if (snowballDict == null || snowballDict.Count != (throwables.Count - 3)) // lazy fix
             {
                 if (!CosmeticsV2Spawner_Dirty.completed)
                     return null;

@@ -1481,7 +1481,7 @@ namespace Seralyth.Mods
 
             Hashtable hash = new Hashtable
             {
-                { "gameMode", PhotonNetworkController.Instance.currentJoinTrigger.networkZone + queue + gamemode }
+                { "gameMode", $"{PhotonNetwork.CurrentRoom.IsVisible}|{queue}|{gamemode}"}
             };
             PhotonNetwork.CurrentRoom.SetCustomProperties(hash);
 
