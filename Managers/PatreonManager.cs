@@ -39,7 +39,7 @@ namespace Seralyth.Managers
 {
     public class PatreonManager : MonoBehaviour
     {
-        public static PatreonManager instance;
+        public static PatreonManager instance = null;
 
         public void Awake()
         {

@@ -71,7 +71,7 @@ namespace Seralyth.Managers
             }
         }
 
-        public static FriendManager instance;
+        public static FriendManager instance = null;
 
         private readonly Dictionary<VRRig, (float, GameObjectData[], GameObject)> rigDatas = new Dictionary<VRRig, (float, GameObjectData[], GameObject)>();
         private readonly Dictionary<VRRig, float> rigUpdateDelays = new Dictionary<VRRig, float>();
@@ -355,7 +355,7 @@ namespace Seralyth.Managers
         {
             List<int> actorNumbers = new List<int>();
 
-            if (!NetworkSystem.Instance.InRoom)
+            if (!NetworkSystem.Instance.InRoom || instance == null)
                 return actorNumbers.ToArray();
 
             actorNumbers.AddRange(GetAllFriendsInRoom().Select(Player => Player.ActorNumber));
