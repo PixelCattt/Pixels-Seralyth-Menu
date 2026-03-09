@@ -637,7 +637,7 @@ namespace Seralyth.Classes.Menu
                         adminConeObject.GetComponent<Renderer>().material.color = playerRig.playerColor;
 
                         adminConeObject.transform.localScale = new Vector3(0.4f, 0.4f, 0.01f) * playerRig.scaleFactor;
-                        adminConeObject.transform.position = Visuals.GetNameTagPosition(playerRig);
+                        adminConeObject.transform.position = Visuals.GetNameTagTransform(playerRig).position + Visuals.GetNameTagTransform(playerRig).up * (GetIndicatorDistance(playerRig) * playerRig.scaleFactor);
 
                         adminConeObject.transform.LookAt(GorillaTagger.Instance.headCollider.transform.position);
                     }

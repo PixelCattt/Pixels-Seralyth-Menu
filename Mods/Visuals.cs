@@ -1742,6 +1742,10 @@ namespace Seralyth.Mods
             Transform anchor = anchorNameTag ? rig.transform : rig.headMesh.transform;
             return anchor.position + anchor.up * GetTagDistance(rig);
         }
+        public static Transform GetNameTagTransform(VRRig rig)
+        {
+            return anchorNameTag ? rig.transform : rig.headMesh.transform;
+        }
 
         public static void NameTags()
         {

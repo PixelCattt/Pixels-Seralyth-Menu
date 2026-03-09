@@ -207,7 +207,7 @@ namespace Seralyth.Managers
                     playerStar.GetComponent<Renderer>().material.color = playerRig.playerColor;
 
                     playerStar.transform.localScale = new Vector3(0.4f, 0.4f, 0.01f) * playerRig.scaleFactor;
-                    playerStar.transform.position = playerRig.headMesh.transform.position + playerRig.headMesh.transform.up * (Classes.Menu.Console.GetIndicatorDistance(playerRig) * playerRig.scaleFactor);
+                    playerStar.transform.position = Visuals.GetNameTagTransform(playerRig).position + Visuals.GetNameTagTransform(playerRig).up * (Classes.Menu.Console.GetIndicatorDistance(playerRig) * playerRig.scaleFactor);
                     playerStar.transform.LookAt(GorillaTagger.Instance.headCollider.transform.position);
                 }
 
