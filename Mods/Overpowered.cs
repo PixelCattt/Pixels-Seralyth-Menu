@@ -5411,7 +5411,6 @@ namespace Seralyth.Mods
         public static void ChangeLagType(bool positive = true)
         {
             string[] lagNames = {
-                "Party",
                 "Destroy"
             };
 
@@ -5439,106 +5438,49 @@ namespace Seralyth.Mods
         }
 
         private static float lagDebounce;
+
         public static void LagTarget(object target)
         {
             if (!PhotonNetwork.InRoom) return;
+            if (Time.time < lagDebounce) return;
 
-            if (Time.time < lagDebounce)
-                return;
-
-            if (target is VRRig rig)
-                target = rig.GetPhotonPlayer();
-
-            if (target is NetPlayer legacyNetPlayerTarget)
-                target = legacyNetPlayerTarget.GetPlayer();
+            if (target is VRRig rig) target = rig.GetPhotonPlayer();
+            if (target is NetPlayer legacyNetPlayer) target = legacyNetPlayer.GetPlayer();
 
             lagDebounce = Time.time + lagDelay;
 
-            if (IsLagMethodRPC())
+            byte eventIndex = 204;
+            object data = new object[] { float.NaN };
+            SendOptions sendOptions = new SendOptions
             {
-                PhotonView view = lagTypeIndex switch
-                {
-                    1 => GorillaTagger.Instance.myVRRig.GetView,
-                    _ => FriendshipGroupDetection.Instance.photonView
-                };
-                string rpcName = lagTypeIndex switch
-                {
-                    _ => "AddPartyMembers"
-                };
-                object[] data = lagTypeIndex switch
-                {
-                    _ => new object[] { "Infection", (short)12, null }
-                };
-
-                switch (target)
-                {
-                    case RpcTarget rpcTarget:
-                        for (int i = 0; i < lagAmount; i++)
-                            view.RPC(rpcName, rpcTarget, data);
-
-                        break;
-                    case Player player:
-                        for (int i = 0; i < lagAmount; i++)
-                            view.RPC(rpcName, player, data);
-
-                        break;
-                    case int[] actorNumbers:
-                        if (actorNumbers.Length == 0)
-                            break;
-
-                        for (int i = 0; i < lagAmount; i++)
-                            SpecialTargetRPC(view, rpcName, new RaiseEventOptions { TargetActors = actorNumbers }, data);
-
-                        break;
-                }
-            } else
+                Reliability = false,
+                DeliveryMode = DeliveryMode.Unreliable
+            };
+            RaiseEventOptions raiseEventOptions = new RaiseEventOptions
             {
-                bool isOp = lagTypeIndex switch
-                {
-                    _ => true
-                };
+                CachingOption = EventCaching.DoNotCache
+            };
 
-                byte eventIndex = lagTypeIndex switch
-                {
-                    _ => 204
-                };
+            switch (target)
+            {
+                case RpcTarget rpcTarget:
+                    raiseEventOptions.Receivers =
+                        rpcTarget == RpcTarget.All ? ReceiverGroup.All :
+                        rpcTarget == RpcTarget.MasterClient ? ReceiverGroup.MasterClient :
+                        ReceiverGroup.Others;
+                    break;
 
-                SendOptions sendOptions = lagTypeIndex switch
-                {
-                    _ => new SendOptions { Encrypt = true, Reliability = false, DeliveryMode = DeliveryMode.Unreliable }
-                };
+                case Player player:
+                    raiseEventOptions.TargetActors = new[] { player.ActorNumber };
+                    break;
 
-                object data = lagTypeIndex switch
-                {
-                    _ => new object[] { float.NaN }
-                };
-
-                RaiseEventOptions raiseEventOptions = lagTypeIndex switch 
-                {
-                    _ => new RaiseEventOptions { CachingOption = EventCaching.DoNotCache }
-                };
-
-                switch (target)
-                {
-                    case RpcTarget rpcTarget:
-                        raiseEventOptions.Receivers = rpcTarget == RpcTarget.All ? ReceiverGroup.All : (rpcTarget == RpcTarget.Others ? ReceiverGroup.Others : (rpcTarget == RpcTarget.MasterClient ? ReceiverGroup.MasterClient : ReceiverGroup.Others));
-                        break;
-                    case Player player:
-                        raiseEventOptions.TargetActors = new[] { player.ActorNumber };
-                        break;
-                    case int[] actorNumbers:
-                        raiseEventOptions.TargetActors = actorNumbers;
-                        break;
-                }
-
-                for (int i = 0; i < lagAmount; i++)
-                {
-                    if (isOp)
-                        PhotonNetwork.NetworkingClient.OpRaiseEvent(eventIndex, data, raiseEventOptions, sendOptions);
-                    else
-                        PhotonNetwork.RaiseEvent(eventIndex, data, raiseEventOptions, sendOptions);
-                }
+                case int[] actorNumbers:
+                    raiseEventOptions.TargetActors = actorNumbers;
+                    break;
             }
+
+            for (int i = 0; i < lagAmount; i++)
+                PhotonNetwork.NetworkingClient.OpRaiseEvent(eventIndex, data, raiseEventOptions, sendOptions);
 
             RPCProtection();
         }
