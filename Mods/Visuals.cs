@@ -2131,13 +2131,13 @@ namespace Seralyth.Mods
                             var subDetails = SubscriptionManager.GetSubscriptionDetails(vrrig);
                             if (subDetails.tier > 0)
                             {
-                                GameObject go = new GameObject("Seralyth_Kidtag");
+                                GameObject go = new GameObject("Seralyth_SubscriberTag");
                                 go.transform.localScale = new Vector3(0.25f, 0.25f, 0.25f);
                                 TextMeshPro TextMeshPro = go.GetOrAddComponent<TextMeshPro>();
                                 TextMeshPro.fontSize = 4.8f;
                                 TextMeshPro.alignment = TextAlignmentOptions.Center;
                                 TextMeshPro.color = SubscriptionManager.SUBSCRIBER_NAME_COLOR;
-                                TextMeshPro.SafeSetText($"Subscriber {subDetails.daysAccrued}d");
+                                TextMeshPro.SafeSetText($"VIM Subscriber");
 
                                 TextMeshPro.SafeSetFontStyle(activeFontStyle);
                                 TextMeshPro.SafeSetFont(activeFont);
