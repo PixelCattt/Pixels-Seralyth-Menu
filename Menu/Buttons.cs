@@ -362,6 +362,12 @@ namespace Seralyth.Menu
                 new ButtonInfo { buttonText = "Random Direction", toolTip = "Makes the projectiles go everywhere." },
                 new ButtonInfo { buttonText = "Random Color", toolTip = "Makes the projectiles random colors." },
 
+                new ButtonInfo { buttonText = "Alternate Projectile Hand", toolTip = "Constantly swaps the hand that the projectile mods shoot from." },
+                new ButtonInfo { buttonText = "Left Handed Projectiles", toolTip = "Allows you to shoot projectiles from your left hand as well." },
+
+                new ButtonInfo { buttonText = "Both Handed Projectiles", toolTip = "Allows you to shoot projectiles from your both hands." },
+
+
                 new ButtonInfo { buttonText = "Change Shoot Speed", overlapText = "Change Shoot Speed <color=grey>[</color><color=green>Medium</color><color=grey>]</color>", method =() => Projectiles.ChangeShootSpeed(), enableMethod =() => Projectiles.ChangeShootSpeed(), disableMethod =() => Projectiles.ChangeShootSpeed(false), incremental = true, isTogglable = false, toolTip = "Changes the speed of shooting projectiles." },
                 new ButtonInfo { buttonText = "Shoot Projectiles", toolTip = "Shoots projectiles like a gun." },
 

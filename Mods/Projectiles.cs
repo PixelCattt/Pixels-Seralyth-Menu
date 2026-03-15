@@ -226,7 +226,7 @@ namespace Seralyth.Mods
 
                 if (Time.time > projDebounce)
                 {
-                    if (Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, position) > 3.9f && !bypassTeleport)
+                    if (Vector3.Distance(GorillaTagger.Instance.bodyCollider.transform.position, position) > 3.9f && !bypassTeleport || (!clientSided && !friendSided))
                     {
                         VRRig.LocalRig.enabled = false;
                         VRRig.LocalRig.transform.position = position + new Vector3(0f, velocity.y > 0f ? -3f : 3f, 0f);
@@ -632,66 +632,80 @@ namespace Seralyth.Mods
         {
             int projIndex = projMode * 2;
 
-            if (rightGrab || Mouse.current.leftButton.isPressed)
+            bool fireLeft = (Buttons.GetIndex("Left Handed Projectiles").enabled || Buttons.GetIndex("Both Handed Projectiles").enabled) && leftGrab;
+            bool fireRight = rightGrab || Mouse.current.leftButton.isPressed;
+
+            if (Buttons.GetIndex("Both Handed Projectiles").enabled)
+            {
+                fireLeft = leftGrab;
+                fireRight = rightGrab;
+            }
+
+            if (fireLeft || fireRight)
             {
                 if (Buttons.GetIndex("Random Projectile").enabled)
                     projIndex = Random.Range(0, ProjectileObjectNames.Length);
-                
                 string projectilename = ProjectileObjectNames[projIndex];
 
-                Vector3 startpos = GorillaTagger.Instance.rightHandTransform.position;
-                Vector3 charvel = GTPlayer.Instance.RigidbodyVelocity;
+                Transform[] hands = new Transform[] { GorillaTagger.Instance.leftHandTransform, GorillaTagger.Instance.rightHandTransform };
+                bool[] fireHands = new bool[] { fireLeft, fireRight };
 
-                if (Buttons.GetIndex("Shoot Projectiles").enabled)
+                for (int i = 0; i < 2; i++)
                 {
-                    charvel = GTPlayer.Instance.RigidbodyVelocity + GetGunDirection(GorillaTagger.Instance.rightHandTransform) * ShootStrength;
-                    if (Mouse.current.leftButton.isPressed)
+                    if (!fireHands[i]) continue;
+
+                    Vector3 startpos = hands[i].position;
+                    Vector3 charvel = GTPlayer.Instance.RigidbodyVelocity;
+
+                    if (Buttons.GetIndex("Shoot Projectiles").enabled)
                     {
-                        Ray ray = TPC.ScreenPointToRay(Mouse.current.position.ReadValue());
-                        Physics.Raycast(ray, out var hit, 512f, NoInvisLayerMask());
-                        charvel = hit.point - GorillaTagger.Instance.rightHandTransform.transform.position;
-                        charvel.Normalize();
-                        charvel *= ShootStrength * 2f;
+                        charvel += GetGunDirection(hands[i]) * ShootStrength;
+
+                        if (Mouse.current.leftButton.isPressed)
+                        {
+                            Ray ray = TPC.ScreenPointToRay(Mouse.current.position.ReadValue());
+                            if (Physics.Raycast(ray, out var hit, 512f, NoInvisLayerMask()))
+                            {
+                                charvel = (hit.point - hands[i].position).normalized * ShootStrength * 2f;
+                            }
+                        }
                     }
+
+                    if (Buttons.GetIndex("Random Direction").enabled)
+                        charvel = RandomVector3(100f);
+                    if (Buttons.GetIndex("Above Players").enabled)
+                    {
+                        VRRig targetRig = GetTargetPlayer();
+                        startpos = targetRig.transform.position + Vector3.up;
+                    }
+                    if (Buttons.GetIndex("Rain Projectiles").enabled)
+                    {
+                        startpos = GorillaTagger.Instance.headCollider.transform.position + new Vector3(Random.Range(-2f, 2f), 2f, Random.Range(-2f, 2f));
+                        charvel = Vector3.zero;
+                    }
+                    if (Buttons.GetIndex("Projectile Aura").enabled)
+                    {
+                        float time = Time.frameCount;
+                        startpos = GorillaTagger.Instance.headCollider.transform.position + new Vector3(MathF.Cos(time / 20), 2, MathF.Sin(time / 20));
+                    }
+                    if (Buttons.GetIndex("True Projectile Aura").enabled)
+                    {
+                        startpos = GorillaTagger.Instance.headCollider.transform.position + RandomVector3();
+                        charvel = RandomVector3(10f);
+                    }
+                    if (Buttons.GetIndex("Projectile Fountain").enabled)
+                    {
+                        startpos = GorillaTagger.Instance.headCollider.transform.position + new Vector3(0, 1, 0);
+                        charvel = new Vector3(Random.Range(-10, 10), 15, Random.Range(-10, 10));
+                    }
+
+                    if (Buttons.GetIndex("Include Hand Velocity").enabled)
+                        charvel = hands[i] == GorillaTagger.Instance.rightHandTransform
+                            ? GTPlayer.Instance.RightHand.velocityTracker.GetAverageVelocity(true, 0)
+                            : GTPlayer.Instance.LeftHand.velocityTracker.GetAverageVelocity(true, 0);
+
+                    BetaFireProjectile(projectilename, startpos, charvel, CalculateProjectileColor());
                 }
-
-                if (Buttons.GetIndex("Random Direction").enabled)
-                    charvel = RandomVector3(100f);
-
-                if (Buttons.GetIndex("Above Players").enabled)
-                {
-                    VRRig targetRig = GetTargetPlayer();
-                    startpos = targetRig.transform.position + Vector3.up;
-                }
-
-                if (Buttons.GetIndex("Rain Projectiles").enabled)
-                {
-                    startpos = GorillaTagger.Instance.headCollider.transform.position + new Vector3(Random.Range(-2f, 2f), 2f, Random.Range(-2f, 2f));
-                    charvel = Vector3.zero;
-                }
-
-                if (Buttons.GetIndex("Projectile Aura").enabled)
-                {
-                    float time = Time.frameCount;
-                    startpos = GorillaTagger.Instance.headCollider.transform.position + new Vector3(MathF.Cos(time / 20), 2, MathF.Sin(time / 20));
-                }
-
-                if (Buttons.GetIndex("True Projectile Aura").enabled)
-                {
-                    startpos = GorillaTagger.Instance.headCollider.transform.position + RandomVector3();
-                    charvel = RandomVector3(10f);
-                }
-
-                if (Buttons.GetIndex("Projectile Fountain").enabled)
-                {
-                    startpos = GorillaTagger.Instance.headCollider.transform.position + new Vector3(0, 1, 0);
-                    charvel = new Vector3(Random.Range(-10, 10), 15, Random.Range(-10, 10));
-                }
-
-                if (Buttons.GetIndex("Include Hand Velocity").enabled)
-                    charvel = GTPlayer.Instance.RightHand.velocityTracker.GetAverageVelocity(true, 0);
-
-                BetaFireProjectile(projectilename, startpos, charvel, CalculateProjectileColor());
             }
         }
 
