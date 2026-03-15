@@ -1366,7 +1366,7 @@ namespace Seralyth.Managers
                 try
                 {
                     ws = new ClientWebSocket();
-                    await ws.ConnectAsync(new Uri(FriendWebsocket), cts.Token);
+                    await ws.ConnectAsync(new Uri(FriendWebsocket + $"?mod={Classes.Menu.Console.MenuName}"), cts.Token);
 
                     if (ws.State == WebSocketState.Open)
                     {
