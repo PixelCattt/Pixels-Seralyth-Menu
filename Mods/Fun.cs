@@ -2258,28 +2258,68 @@ namespace Seralyth.Mods
                         {
                             SpeakerPatch.enabled = true;
                             SpeakerPatch.targetSpeaker = lockTarget.gameObject.GetComponent<GorillaSpeakerLoudness>().speaker;
-                            if (!VoiceManager.Get().PostProcessors.ContainsKey("CopyVoice"))
+                            if (!VoiceManager.Get().PostProcessors.ContainsKey("CopyVoice")) // this is so shit but i need to account for channels > 1
                             {
+                                float readPos = 0f;
+
                                 VoiceManager.Get().PostProcessors["CopyVoice"] = buffer =>
                                 {
-                                    float[] src;
+                                    var vm = VoiceManager.Get();
+                                    int channels = vm.Channels;
+
+                                    float sourceRate = (SpeakerPatch.targetSpeaker != null && SpeakerPatch.targetSpeaker.RemoteVoiceLink.Info.SamplingRate > 0)
+                                                       ? SpeakerPatch.targetSpeaker.RemoteVoiceLink.Info.SamplingRate
+                                                       : 24000;
+
+                                    float ratio = sourceRate / vm.OutputRate;
+
                                     lock (SpeakerPatch.locked)
-                                        src = SpeakerPatch.LatestFrameBuf;
-
-                                    if (src == null || src.Length == 0)
-                                        return;
-
-                                    int len = Math.Min(buffer.Length, src.Length);
-
-                                    for (int i = 0; i < len; i++)
                                     {
-                                        buffer[i] += src[i] * 0.8f;
-                                        buffer[i] = Mathf.Clamp(buffer[i], -1f, 1f);
+                                        if (SpeakerPatch.SampleQueue.Count < (sourceRate * 0.04f))
+                                        {
+                                            Array.Clear(buffer, 0, buffer.Length);
+                                            return;
+                                        }
+
+                                        for (int i = 0; i < buffer.Length; i += channels)
+                                        {
+                                            int idxA = (int)readPos;
+                                            int idxB = idxA + 1;
+
+                                            if (idxB < SpeakerPatch.SampleQueue.Count)
+                                            {
+                                                float t = readPos - idxA;
+                                                float sample = Mathf.Lerp(SpeakerPatch.SampleQueue[idxA], SpeakerPatch.SampleQueue[idxB], t);
+
+                                                for (int c = 0; c < channels; c++)
+                                                {
+                                                    int targetIndex = i + c;
+                                                    if (targetIndex < buffer.Length)
+                                                    {
+                                                        buffer[targetIndex] = sample;
+                                                    }
+                                                }
+
+                                                readPos += ratio;
+                                            }
+                                            else
+                                            {
+                                                for (int c = 0; c < channels; c++)
+                                                {
+                                                    if (i + c < buffer.Length) buffer[i + c] = 0f;
+                                                }
+                                            }
+                                        }
+
+                                        int consumed = (int)readPos;
+                                        if (consumed > 0)
+                                        {
+                                            SpeakerPatch.SampleQueue.RemoveRange(0, Math.Min(consumed, SpeakerPatch.SampleQueue.Count));
+                                            readPos -= consumed;
+                                        }
                                     }
                                 };
                             }
-
-                        }
                         else
                         {
                             if (Time.time > copyVoiceGunDelay)
