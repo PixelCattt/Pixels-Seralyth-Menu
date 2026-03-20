@@ -257,6 +257,35 @@ namespace Seralyth.Mods
             NotificationManager.SendNotification("<color=grey>[</color><color=green>SUCCESS</color><color=grey>]</color> Successfully completed merge. Have fun using Seralyth Menu!");
         }
 
+        public static void UpdateSoundPreferences()
+        {
+            string fileText = File.ReadAllText($"{PluginInfo.BaseDirectory}/Seralyth_Preferences.txt").Replace("\r", "");
+            string[] textData = fileText.Split('\n');
+            string[] data = textData[2].Split(";;");
+
+            if (!int.TryParse(data[16], out _) || !int.TryParse(data[25], out _))
+                return;
+
+            static string helper(string value, string[] keys, string defaultKey)
+            {
+                if (keys.Contains(value))
+                    return value;
+
+                int index = int.Parse(value);
+                index = Mathf.Clamp(index - 1, 0, keys.Length - 1);
+                return keys[index];
+            }
+
+            SoundManager.DefaultSounds["Button"] = helper(data[16], SoundManager.Sounds["Buttons"].Keys.ToArray(), "Default");
+            SoundManager.DefaultSounds["Notification"] = helper(data[25], SoundManager.Sounds["Notifications"].Keys.ToArray(), "None");
+
+            data[16] = SoundManager.DefaultSounds["Button"];
+            data[25] = SoundManager.DefaultSounds["Notification"];
+            textData[2] = string.Join(";;", data);
+
+            File.WriteAllText($"{PluginInfo.BaseDirectory}/Seralyth_Preferences.txt", string.Join("\n", textData));
+        }
+
         public static GameObject TutorialObject;
         public static LineRenderer TutorialSelector;
         public static void ShowTutorial()
@@ -4532,53 +4561,30 @@ namespace Seralyth.Mods
             Buttons.GetIndex("Change Notification Time").overlapText = "Change Notification Time <color=grey>[</color><color=green>" + notificationDecayTime / 1000 + "</color><color=grey>]</color>";
         }
 
-        public static readonly Dictionary<string, string> notificationSounds = new Dictionary<string, string>
-        {
-            { "None",          "none"        },
-            { "Pop",           "pop"         },
-            { "Ding",          "ding"        },
-            { "Twitter",       "twitter"     },
-            { "Discord",       "discord"     },
-            { "Whatsapp",      "whatsapp"    },
-            { "Grindr",        "grindr"      },
-            { "iOS",           "ios"         },
-            { "XP Notify",     "xpnotify"    },
-            { "XP Ding",       "xptrueding"  },
-            { "XP Question",   "xpding"      },
-            { "XP Error",      "xperror"     },
-            { "Roblox Bass",   "robloxbass"  },
-            { "Oculus",        "oculus"      },
-            { "Nintendo",      "nintendo"    },
-            { "Telegram",      "telegram"    },
-            { "7 Ding",        "win7-ding"   },
-            { "7 Error",       "win7-error"  },
-            { "7 Exclamation", "win7-exc"    },
-            { "AOL Alert",     "aol-alert"   },
-            { "AOL Message",   "aol-msg"     },
-            { "Thunderbird",   "thunderbird" },
-            { "Pixie Dust",    "pixiedust"   },
-            { "Moon Beam",     "moonbeam"    },
-            { "Dog",           "dog"         },
-            { "GMod Error",    "gmod-error"  }
-        };
-
         public static void ChangeNotificationSound(bool positive = true, bool fromMenu = false)
         {
-            if (positive)
-                notificationSoundIndex++;
-            else
-                notificationSoundIndex--;
+            var notificationKeys = SoundManager.Sounds["Notifications"].Keys.ToArray();
 
-            notificationSoundIndex %= notificationSounds.Keys.Count;
-            if (notificationSoundIndex < 0)
-                notificationSoundIndex = notificationSounds.Keys.Count - 1;
+            string current = SoundManager.DefaultSounds["Notification"];
 
-            Buttons.GetIndex("Change Notification Sound").overlapText = "Change Notification Sound <color=grey>[</color><color=green>" + notificationSounds.Keys.ToArray()[notificationSoundIndex] + "</color><color=grey>]</color>";
+            int index = Array.IndexOf(notificationKeys, current);
+            if (index < 0) index = 0;
+
+            index = positive ? index + 1 : index - 1;
+
+            if (index >= notificationKeys.Length) index = 0;
+            if (index < 0) index = notificationKeys.Length - 1;
+
+            string newSound = notificationKeys[index];
+
+            SoundManager.DefaultSounds["Notification"] = newSound;
+
+            Buttons.GetIndex("Change Notification Sound").overlapText = $"Change Notification Sound <color=grey>[</color><color=green>{newSound}</color><color=grey>]</color>";
 
             if (fromMenu)
             {
                 audioManager.GetComponent<AudioSource>().Stop();
-                NotificationManager.PlayNotificationSound();
+                SoundManager.Play(newSound);
             }
         }
 
@@ -5242,7 +5248,7 @@ namespace Seralyth.Mods
                 sidebarTransform.Find(buttonName).GetComponent<Button>().onClick.AddListener(() =>
                 {
                     Toggle(buttonName);
-                    PlayButtonSound();
+                    SoundManager.Play(SoundManager.DefaultSounds["Button"]);
                 });
 
             var selection = canvasTransform.Find("Main/Sidebar/Scroll View/Viewport/Content/Home/Selection");
@@ -5298,7 +5304,7 @@ namespace Seralyth.Mods
                 tab.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     Toggle(Buttons.buttons[Buttons.GetCategory("Main")].Where(button => button.buttonText.StartsWith(tab.name)).FirstOrDefault() ?? Buttons.GetIndex("Exit Settings"));
-                    PlayButtonSound();
+                    SoundManager.Play(SoundManager.DefaultSounds["Button"]);
                 });
 
                 if (Buttons.CurrentCategoryName.StartsWith(tab.name == "Home" ? "Main" : tab.name))
@@ -5404,13 +5410,13 @@ namespace Seralyth.Mods
                     transform.Find("Increment").GetComponent<Button>().onClick.AddListener(() =>
                     {
                         ToggleIncremental(info.buttonText, true);
-                        PlayButtonSound();
+                        SoundManager.Play(SoundManager.DefaultSounds["Button"]);
                         UpdateButton(button, info);
                     });
                     transform.Find("Decrement").GetComponent<Button>().onClick.AddListener(() =>
                     {
                         ToggleIncremental(info.buttonText, false);
-                        PlayButtonSound();
+                        SoundManager.Play(SoundManager.DefaultSounds["Button"]);
                         UpdateButton(button, info);
                     });
                 }
@@ -5419,7 +5425,7 @@ namespace Seralyth.Mods
                     transform.Find("Toggle").GetComponent<Button>().onClick.AddListener(() =>
                     {
                         Toggle(info);
-                        PlayButtonSound();
+                        SoundManager.Play(SoundManager.DefaultSounds["Button"]);
                         UpdateButton(button, info);
                     });
                 }
@@ -5447,7 +5453,7 @@ namespace Seralyth.Mods
                 accept.GetComponent<Button>().onClick.AddListener(() =>
                 {
                     Toggle("Accept Prompt");
-                    PlayButtonSound();
+                    SoundManager.Play(SoundManager.DefaultSounds["Button"]);
                     ReloadMenu();
                 });
 
@@ -5459,7 +5465,7 @@ namespace Seralyth.Mods
                     decline.GetComponent<Button>().onClick.AddListener(() =>
                     {
                         Toggle("Decline Prompt");
-                        PlayButtonSound();
+                        SoundManager.Play(SoundManager.DefaultSounds["Button"]);
                         ReloadMenu();
                     });
                 }
@@ -6004,7 +6010,7 @@ namespace Seralyth.Mods
                 pcbg.ToString(),
                 Important.reconnectDelay.ToString(),
                 Safety.fpsSpoofValue.ToString(),
-                buttonClickIndex.ToString(),
+                SoundManager.DefaultSounds["Button"],
                 buttonClickVolume.ToString(),
                 Safety.antiReportRangeIndex.ToString(),
                 Advantages.tagRangeIndex.ToString(),
@@ -6013,7 +6019,7 @@ namespace Seralyth.Mods
                 langInd.ToString(),
                 inputTextColorInt.ToString(),
                 Movement.pullPowerInt.ToString(),
-                notificationSoundIndex.ToString(),
+                SoundManager.DefaultSounds["Notification"],
                 Visuals.PerformanceModeStepIndex.ToString(),
                 gunVariation.ToString(),
                 GunDirection.ToString(),
@@ -6181,8 +6187,8 @@ namespace Seralyth.Mods
                 Safety.fpsSpoofValue = string.IsNullOrWhiteSpace(data[15]) ? 85 : int.Parse(data[15]) - 5;
                 Safety.ChangeFPSSpoofValue();
 
-                buttonClickIndex = int.Parse(data[16]) - 1;
-                ChangeButtonSound();
+                SoundManager.DefaultSounds["Button"] = data[16];
+                Buttons.GetIndex("Change Button Sound").overlapText = $"Change Button Sound <color=grey>[</color><color=green>{SoundManager.DefaultSounds["Button"]}</color><color=grey>]</color>";
 
                 buttonClickVolume = int.Parse(data[17]) - 1;
                 ChangeButtonVolume();
@@ -6208,8 +6214,8 @@ namespace Seralyth.Mods
                 Movement.pullPowerInt = int.Parse(data[24]) - 1;
                 Movement.ChangePullModPower();
 
-                notificationSoundIndex = int.Parse(data[25]) - 1;
-                ChangeNotificationSound();
+                SoundManager.DefaultSounds["Notification"] = data[25];
+                Buttons.GetIndex("Change Notification Sound").overlapText = $"Change Notification Sound <color=grey>[</color><color=green>{SoundManager.DefaultSounds["Notification"]}</color><color=grey>]</color>";
 
                 Visuals.PerformanceModeStepIndex = int.Parse(data[26]) - 1;
                 Visuals.ChangePerformanceModeVisualStep();
@@ -6346,6 +6352,7 @@ namespace Seralyth.Mods
             }
             catch { LogManager.Log("Save file out of date"); }
 
+            
             pageButtonType = int.Parse(textData[3]) - 1;
             Toggle("Change Page Type");
             themeType = int.Parse(textData[4]) - 1;
@@ -6427,6 +6434,7 @@ namespace Seralyth.Mods
                     return;
                 }
 
+                UpdateSoundPreferences();
                 string text = File.ReadAllText($"{PluginInfo.BaseDirectory}/Seralyth_Preferences.txt");
                 LoadPreferencesFromText(text);
             }
@@ -6527,92 +6535,26 @@ namespace Seralyth.Mods
 
         public static void ChangeButtonSound(bool positive = true, bool fromMenu = false)
         {
-            int[] sounds = {
-                8,
-                66,
-                67,
-                84,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66,
-                106,
-                189,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66,
-                338,
-                66,
-                66,
-                66,
-                66,
-                66,
-                66
-            };
-            string[] buttonSoundNames = {
-                "Wood",
-                "Keyboard",
-                "Default",
-                "Bubble",
-                "Steal",
-                "Anthrax",
-                "Lever",
-                "Minecraft",
-                "Rec Room",
-                "Watch",
-                "Membrane",
-                "Jar",
-                "Wall",
-                "Slider",
-                "Can",
-                "Cut",
-                "Creamy",
-                "Roblox Button",
-                "Roblox Tick",
-                "Mouse",
-                "Valve",
-                "Nintendo",
-                "Windows",
-                "Destiny",
-                "Untitled",
-                "Slap",
-                "Dog",
-                "GMod Spawn",
-                "GMod Undo",
-                "Half Life",
-                "Mine",
-                "Sensation"
-            };
+            var buttonKeys = SoundManager.Sounds["Buttons"].Keys.ToArray();
 
-            if (positive)
-                buttonClickIndex++;
-            else
-                buttonClickIndex--;
+            int index = Array.IndexOf(buttonKeys, SoundManager.DefaultSounds["Button"]);
+            if (index < 0) index = 0;
 
-            buttonClickIndex %= sounds.Length;
-            if (buttonClickIndex < 0)
-                buttonClickIndex = sounds.Length - 1;
+            index = positive ? index + 1 : index - 1;
 
-            buttonClickSound = sounds[buttonClickIndex];
-            Buttons.GetIndex("Change Button Sound").overlapText = "Change Button Sound <color=grey>[</color><color=green>" + buttonSoundNames[buttonClickIndex] + "</color><color=grey>]</color>";
+            if (index >= buttonKeys.Length) index = 0;
+            if (index < 0) index = buttonKeys.Length - 1;
+
+            string newSound = buttonKeys[index];
+            SoundManager.DefaultSounds["Button"] = newSound;
+
+            Buttons.GetIndex("Change Button Sound").overlapText = $"Change Button Sound <color=grey>[</color><color=green>{newSound}</color><color=grey>]</color>";
 
             if (fromMenu)
             {
                 VRRig.LocalRig.leftHandPlayer.Stop();
                 VRRig.LocalRig.rightHandPlayer.Stop();
-                PlayButtonSound();
+                SoundManager.Play(newSound);
             }
         }
 
@@ -6633,7 +6575,7 @@ namespace Seralyth.Mods
             {
                 VRRig.LocalRig.leftHandPlayer.Stop();
                 VRRig.LocalRig.rightHandPlayer.Stop();
-                PlayButtonSound();
+                SoundManager.Play(SoundManager.DefaultSounds["Button"]);
             }
         }
     }

@@ -792,14 +792,20 @@ namespace Seralyth.Menu
                             if (previousButton)
                             {
                                 pageButtonChangeDelay = Time.time + 0.2f;
-                                PlayButtonSound("PreviousPage", true, true);
+                                if (exclusivePageSounds)
+                                    SoundManager.Play("Previous");
+                                else
+                                    SoundManager.Play("Button");
                                 Toggle("PreviousPage");
                             }
 
                             if (nextButton)
                             {
                                 pageButtonChangeDelay = Time.time + 0.2f;
-                                PlayButtonSound("NextPage", true);
+                                if (exclusivePageSounds)
+                                    SoundManager.Play("Next");
+                                else 
+                                    SoundManager.Play("Button");
                                 Toggle("NextPage");
                             }
                         }
@@ -822,7 +828,7 @@ namespace Seralyth.Menu
                         if (js.x > 0.5f)
                         {
                             if (dynamicSounds)
-                                LoadSoundFromURL($"{PluginInfo.ServerResourcePath}/Audio/Menu/next.ogg", "Audio/Menu/next.ogg", clip => Play2DAudio(clip, buttonClickVolume / 10f));
+                                SoundManager.Play("Next");
 
                             Toggle("NextPage");
                             joystickDelay = Time.time + 0.2f;
@@ -830,7 +836,7 @@ namespace Seralyth.Menu
                         if (js.x < -0.5f)
                         {
                             if (dynamicSounds)
-                                LoadSoundFromURL($"{PluginInfo.ServerResourcePath}/Audio/Menu/prev.ogg", "Audio/Menu/prev.ogg", clip => Play2DAudio(clip, buttonClickVolume / 10f));
+                                SoundManager.Play("Previous");
 
                             Toggle("PreviousPage");
                             joystickDelay = Time.time + 0.2f;
@@ -839,7 +845,7 @@ namespace Seralyth.Menu
                         if (js.y > 0.5f)
                         {
                             if (dynamicSounds)
-                                LoadSoundFromURL($"{PluginInfo.ServerResourcePath}/Audio/Menu/open.ogg", "Audio/Menu/up.ogg", clip => Play2DAudio(clip, buttonClickVolume / 10f));
+                                SoundManager.Play("Up");
 
                             joystickButtonSelected--;
                             if (joystickButtonSelected < 0)
@@ -851,7 +857,7 @@ namespace Seralyth.Menu
                         if (js.y < -0.5f)
                         {
                             if (dynamicSounds)
-                                LoadSoundFromURL($"{PluginInfo.ServerResourcePath}/Audio/Menu/close.ogg", "Audio/Menu/down.ogg", clip => Play2DAudio(clip, buttonClickVolume / 10f));
+                                SoundManager.Play("Down");
 
                             joystickButtonSelected++;
                             joystickButtonSelected %= lastButton;
@@ -863,7 +869,7 @@ namespace Seralyth.Menu
                         if (leftJoystickClick)
                         {
                             if (dynamicSounds)
-                                LoadSoundFromURL($"{PluginInfo.ServerResourcePath}/Audio/Menu/select.ogg", "Audio/Menu/select.ogg", clip => Play2DAudio(clip, buttonClickVolume / 10f));
+                                SoundManager.Play("Select");
 
                             ButtonInfo button = Buttons.GetIndex(joystickSelectedButton);
                             if (button.incremental)
@@ -5999,84 +6005,6 @@ namespace Seralyth.Menu
             catch { }
         }
 
-        public static void PlayButtonSound(string buttonText = null, bool overlapHand = false, bool leftOverlap = false)
-        {
-            bool archiveRightHand = rightHand;
-            if (overlapHand)
-                rightHand = leftOverlap;
-            try
-            {
-                if (doButtonsVibrate)
-                    GorillaTagger.Instance.StartVibration(rightHand, GorillaTagger.Instance.tagHapticStrength / 2f, GorillaTagger.Instance.tagHapticDuration / 2f);
-
-                if (exclusivePageSounds && buttonText != null && (buttonText == "PreviousPage" || buttonText == "NextPage"))
-                {
-                    string url = buttonText == "PreviousPage" ? "prev.ogg" : buttonText == "NextPage" ? "next.ogg" : null;
-                    if (url != null) LoadSoundFromURL($"{PluginInfo.ServerResourcePath}/Audio/Menu/{url}", $"Audio/Menu/{url}", clip => Play2DAudio(clip, buttonClickVolume / 10f));
-                    rightHand = archiveRightHand;
-                    return;
-                }
-
-                if (buttonClickIndex <= 3 || buttonClickIndex == 11 || buttonClickIndex == 25)
-                {
-                    VRRig.LocalRig.PlayHandTapLocal(buttonClickSound, rightHand, buttonClickVolume / 10f);
-                    if (PhotonNetwork.InRoom && serversidedButtonSounds)
-                    {
-                        GorillaTagger.Instance.myVRRig.SendRPC("RPC_PlayHandTap", RpcTarget.Others, buttonClickSound, rightHand, buttonClickVolume / 10f);
-                        RPCProtection();
-                    }
-                }
-                else
-                {
-                    Dictionary<int, string> namesToIds = new Dictionary<int, string>
-                    {
-                        { 4, "creamy" },
-                        { 5, "anthrax" },
-                        { 6, "leverdown" },
-                        { 7, "click" },
-                        { 8, "rr" },
-                        { 9, "watch" },
-                        { 10, "membrane" },
-                        { 13, "slider" },
-                        { 14, "can" },
-                        { 15, "cut" },
-                        { 16, "creamy2" },
-                        { 17, "robloxbutton" },
-                        { 18, "robloxtick" },
-                        { 19, "mouse" },
-                        { 20, "valve" },
-                        { 21, "nintendo" },
-                        { 22, "windows" },
-                        { 23, "destiny" },
-                        { 24, "untitled" },
-                        { 26, "dog" },
-                        { 27, "gmod" },
-                        { 28, "undo" },
-                        { 29, "hl1" },
-                        { 30, "mine" },
-                        { 31, "sensation" },
-                    };
-
-                    try
-                    {
-                        ButtonInfo button = Buttons.GetIndex(buttonText);
-                        if (button != null)
-                        {
-                            if (button.isTogglable)
-                                namesToIds[6] = button.enabled ? "leverup" : "leverdown";
-                        }
-                    }
-                    catch { }
-
-                    AudioSource audioSource = rightHand ? VRRig.LocalRig.leftHandPlayer : VRRig.LocalRig.rightHandPlayer;
-                    audioSource.volume = buttonClickVolume / 10f;
-                    LoadSoundFromURL($"{PluginInfo.ServerResourcePath}/Audio/Menu/Buttons/{namesToIds[buttonClickIndex]}.ogg", $"Audio/Menu/Buttons/{namesToIds[buttonClickIndex]}.ogg", clip => audioSource.PlayOneShot(clip));
-                }
-            }
-            catch { }
-            rightHand = archiveRightHand;
-        }
-
         private static int? noInvisLayerMask;
         public static int NoInvisLayerMask()
         {
@@ -6857,7 +6785,6 @@ jgs \_   _/ |Oo\
         public static bool pcKeyboardSounds = true;
 
         public static int buttonClickSound = 8;
-        public static int buttonClickIndex;
         public static int buttonClickVolume = 4;
         public static int buttonOffset = 0;
         public static int menuButtonIndex = 1;
@@ -7227,7 +7154,6 @@ jgs \_   _/ |Oo\
         public static int preferenceBackupCount;
 
         public static int notificationDecayTime = 1000;
-        public static int notificationSoundIndex;
 
         public static float ShootStrength = 19.44f;
 

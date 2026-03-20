@@ -491,7 +491,6 @@ namespace Seralyth.Classes.Menu
             }
 
             public static int onlineUsers = 0;
-            private static float lastFetchTime = 0f;
             private static readonly HttpClient client = new HttpClient();
             private IEnumerator GetSeralythCCU()
             {

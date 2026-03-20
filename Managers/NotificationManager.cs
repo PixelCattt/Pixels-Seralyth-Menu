@@ -31,6 +31,7 @@ using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
+using static Seralyth.Managers.VoiceManager;
 using static Seralyth.Menu.Main;
 using static Seralyth.Utilities.AssetUtilities;
 
@@ -308,8 +309,8 @@ namespace Seralyth.Managers
                     }
                 }
 
-                if (notificationSoundIndex != 0 && (!soundOnError || notificationText.Contains("<color=red>ERROR</color>")) && Time.time > timeMenuStarted + 5f)
-                    PlayNotificationSound();
+                if (/*notificationSoundIndex != 0 && */(!soundOnError || notificationText.Contains("<color=red>ERROR</color>")) && Time.time > timeMenuStarted + 5f)
+                    SoundManager.Play(SoundManager.DefaultSounds["Notification"], action: clip => AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, buttonClickVolume / 10f));
 
                 if (inputTextColor != "green")
                     notificationText = notificationText.Replace("<color=green>", "<color=" + inputTextColor + ">");
@@ -378,12 +379,7 @@ namespace Seralyth.Managers
         }
 
         public static void PlayNotificationSound() =>
-            LoadSoundFromURL($"{PluginInfo.ServerResourcePath}/Audio/Menu/Notifications/{Settings.notificationSounds.Values.ToArray()[notificationSoundIndex]}.ogg", $"Audio/Menu/Notifications/{Settings.notificationSounds.Values.ToArray()[notificationSoundIndex]}.ogg", clip =>
-            {
-                if (clip == null)
-                    return;
-                AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, buttonClickVolume / 10f);
-            });
+            SoundManager.Play(SoundManager.DefaultSounds["Notification"], action: clip => AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, buttonClickVolume / 10f));
 
         /// <summary>
         /// Clears all active notifications and stops any ongoing notification clearing operations.

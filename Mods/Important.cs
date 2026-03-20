@@ -598,7 +598,7 @@ exit";
                     if (Mathf.Abs(leftJoystick.x) > 0.5f)
                     {
                         inputDelay = Time.time + 0.5f;
-                        PlayButtonSound(null, true, true);
+                        SoundManager.Play(SoundManager.DefaultSounds["Button"]);
 
                         if (leftJoystick.x > 0f)
                             SkipTrack();
@@ -609,7 +609,7 @@ exit";
                     if (leftJoystickClick)
                     {
                         inputDelay = Time.time + 0.5f;
-                        PlayButtonSound(null, true, true);
+                        SoundManager.Play(SoundManager.DefaultSounds["Button"]);
 
                         PauseTrack();
                     }

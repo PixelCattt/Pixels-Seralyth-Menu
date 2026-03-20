@@ -38,7 +38,7 @@ namespace Seralyth.Classes.Menu
                 (collider != buttonCollider && collider != lKeyCollider && collider != rKeyCollider) || joystickMenu ||
                 menu == null) return;
             buttonCooldown = Time.time + 0.2f;
-            PlayButtonSound(relatedText);
+            SoundManager.Play(SoundManager.DefaultSounds["Button"], buttonText: relatedText);
 
             if (annoyingMode)
             {
