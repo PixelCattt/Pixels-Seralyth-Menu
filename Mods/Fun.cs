@@ -2489,7 +2489,7 @@ namespace Seralyth.Mods
 
                 if (GetGunInput(true))
                 {
-                    LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+                    LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
                     camera.visible = true;
                     camera.recording = true;
 
@@ -2510,7 +2510,7 @@ namespace Seralyth.Mods
 
                 if (GetGunInput(true))
                 {
-                    LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraTabletInstance;
+                    LckSocialCamera camera = LckSocialCameraManager.Instance._networkedTablet;
                     camera.visible = true;
                     camera.recording = true;
 
@@ -3527,7 +3527,7 @@ Piece Name: {gunTarget.name}";
                 cameraSpamDelay = Time.time + 0.25f;
                 cameraSpamType = !cameraSpamType;
 
-                LckSocialCamera camera = cameraSpamType ? LckSocialCameraManager.Instance._socialCameraCococamInstance : LckSocialCameraManager.Instance._socialCameraTabletInstance;
+                LckSocialCamera camera = cameraSpamType ? LckSocialCameraManager.Instance._networkedCococam : LckSocialCameraManager.Instance._networkedTablet;
 
                 GameObject cameraSpamObject = new GameObject("Seralyth_CameraSpamObject");
                 cameraSpamObject.transform.localScale = Vector3.one * 0.2f;
@@ -3678,7 +3678,7 @@ Piece Name: {gunTarget.name}";
                             if (!PhotonNetwork.InRoom)
                                 break;
 
-                            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+                            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
 
                             GameObject cameraSpamObject = new GameObject("Seralyth_CameraSpamObject");
                             cameraSpamObject.transform.localScale = Vector3.one * 0.2f;
@@ -3722,7 +3722,7 @@ Piece Name: {gunTarget.name}";
                             if (!PhotonNetwork.InRoom)
                                 break;
 
-                            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraTabletInstance;
+                            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedTablet;
 
                             GameObject cameraSpamObject = new GameObject("Seralyth_CameraSpamObject");
                             cameraSpamObject.transform.localScale = Vector3.one * 0.2f;
@@ -3777,7 +3777,7 @@ Piece Name: {gunTarget.name}";
 
         public static void DisableCameraSpam()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
 
             if (camera.GetComponent<ClampPosition>() != null)
                 Object.Destroy(camera.GetComponent<ClampPosition>());
@@ -4053,7 +4053,7 @@ Piece Name: {gunTarget.name}";
 
         public static void PhysicalCamera()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
 
             if (!camera.visible)
             {
@@ -4141,7 +4141,7 @@ Piece Name: {gunTarget.name}";
         {
             if (rightGrab)
             {
-                LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+                LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
                 camera.visible = true;
                 camera.recording = true;
 
@@ -4157,7 +4157,7 @@ Piece Name: {gunTarget.name}";
         {
             if (rightGrab)
             {
-                LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraTabletInstance;
+                LckSocialCamera camera = LckSocialCameraManager.Instance._networkedTablet;
                 camera.visible = true;
                 camera.recording = true;
 
@@ -4213,7 +4213,7 @@ Piece Name: {gunTarget.name}";
 
         public static void DestroyCamera()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
             camera.visible = false;
             camera.recording = false;
 
@@ -4223,7 +4223,7 @@ Piece Name: {gunTarget.name}";
 
         public static void DestroyTablet()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraTabletInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedTablet;
             camera.visible = false;
             camera.recording = false;
 
@@ -5278,7 +5278,7 @@ Piece Name: {gunTarget.name}";
 
         public static void SpazCamera()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
             camera.visible = true;
             camera.recording = true;
 
@@ -5290,7 +5290,7 @@ Piece Name: {gunTarget.name}";
 
         public static void SpazTablet()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraTabletInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedTablet;
             camera.visible = true;
             camera.recording = true;
 
@@ -5326,7 +5326,7 @@ Piece Name: {gunTarget.name}";
 
         public static void OrbitCamera()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
             camera.visible = true;
             camera.recording = true;
 
@@ -5338,7 +5338,7 @@ Piece Name: {gunTarget.name}";
 
         public static void OrbitTablet()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraTabletInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
             camera.visible = true;
             camera.recording = true;
 
@@ -5360,7 +5360,7 @@ Piece Name: {gunTarget.name}";
 
         public static void CameraAura()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
             camera.visible = true;
             camera.recording = true;
 
@@ -5373,7 +5373,7 @@ Piece Name: {gunTarget.name}";
 
         public static void TabletAura()
         {
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraTabletInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedTablet;
             camera.visible = true;
             camera.recording = true;
 
@@ -5483,7 +5483,7 @@ Piece Name: {gunTarget.name}";
             VRRig.LocalRig.enabled = false;
             VRRig.LocalRig.transform.position = GorillaTagger.Instance.bodyCollider.transform.position - Vector3.up * 99999f;
 
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraCococamInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedCococam;
             camera.visible = true;
             camera.recording = true;
 
@@ -5499,7 +5499,7 @@ Piece Name: {gunTarget.name}";
             VRRig.LocalRig.enabled = false;
             VRRig.LocalRig.transform.position = GorillaTagger.Instance.bodyCollider.transform.position - Vector3.up * 99999f;
 
-            LckSocialCamera camera = LckSocialCameraManager.Instance._socialCameraTabletInstance;
+            LckSocialCamera camera = LckSocialCameraManager.Instance._networkedTablet;
             camera.visible = true;
             camera.recording = true;
 
