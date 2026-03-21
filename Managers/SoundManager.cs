@@ -272,14 +272,14 @@ namespace Seralyth.Managers
                 }
 
                 string fallbackButtonName = DefaultSounds.TryGetValue("Button", out var btnName) ? btnName : "Default";
-                if (Sounds.TryGetValue("Buttons", out var buttonsDict) && buttonsDict.TryGetValue(fallbackButtonName, out var btnPathObj) && btnPathObj is string btnPath && !string.IsNullOrEmpty(btnPath))
+                if (Sounds.TryGetValue("Buttons", out var buttonsDict) && buttonsDict.TryGetValue(fallbackButtonName, out var buttonPathObj) && buttonPathObj is string buttonPath && !string.IsNullOrEmpty(buttonPath))
                 {
-                    return btnPath;
+                    return buttonPath;
                 }
 
-                if (Sounds.TryGetValue("Buttons", out var buttonsDefaultDict) && buttonsDefaultDict.TryGetValue("Default", out var btnDefaultObj) && btnDefaultObj is string btnDefaultPath && !string.IsNullOrEmpty(btnDefaultPath))
+                if (Sounds.TryGetValue("Buttons", out var defaultDict) && defaultDict.TryGetValue("Default", out var buttonDefaultObj) && buttonDefaultObj is string defaultPath && !string.IsNullOrEmpty(defaultPath))
                 {
-                    return btnDefaultPath;
+                    return defaultPath;
                 }
 
                 return null;
