@@ -809,7 +809,7 @@ namespace Seralyth.Managers
 
         public static void ShareMacro(string uid, string name)
         {
-            Movement.Macro? sendingMacro = null;
+            Movement.Macro sendingMacro = null;
             foreach (var macroItem in Movement.macros.Select(macroData => macroData.Value).Where(macroItem => String.Equals(macroItem.name.ToLower(), name.ToLower())))
                 sendingMacro = macroItem;
 
