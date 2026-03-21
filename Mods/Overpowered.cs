@@ -3449,7 +3449,7 @@ namespace Seralyth.Mods
             Buttons.GetIndex("Change Snowball Multiplication Factor").overlapText = "Change Snowball Multiplication Factor <color=grey>[</color><color=green>" + snowballMultiplicationFactor + "</color><color=grey>]</color>";
         }
 
-        public static float _snowballSpawnDelay = 0.1f;
+        public static float _snowballSpawnDelay = 0.8f;
         public static float SnowballSpawnDelay
         {
             get { return _snowballSpawnDelay * snowballMultiplicationFactor; }

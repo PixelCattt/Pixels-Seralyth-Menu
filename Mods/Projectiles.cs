@@ -568,7 +568,7 @@ namespace Seralyth.Mods
         }
 
         public static float projDebounce;
-        public static float projDebounceType = 0.4f;
+        public static float projDebounceType = 0.8f;
         public static int projDebounceIndex = 2;
         public static void ChangeProjectileDelay(bool positive = true, bool fromMenu = false)
         {
@@ -582,7 +582,7 @@ namespace Seralyth.Mods
                 projDebounceIndex = 20;
 
             if (projDebounceIndex < 8 && fromMenu && (!Buttons.GetIndex("Friend Sided Projectiles").enabled || !Buttons.GetIndex("Client Sided Projectiles").enabled))
-                NotificationManager.SendNotification("<color=grey>[</color><color=red>WARNING</color><color=grey>]</color> Using a projectile delay lower than 0.4 could get you banned. Use at your own caution.", 5000);
+                NotificationManager.SendNotification("<color=grey>[</color><color=red>WARNING</color><color=grey>]</color> Using a projectile delay lower than 0.8 could get you banned. Use at your own caution.", 5000);
 
             projDebounceType = projDebounceIndex / 20f;
             Overpowered.SnowballSpawnDelay = Mathf.Max(projDebounceType, 0.1f);
