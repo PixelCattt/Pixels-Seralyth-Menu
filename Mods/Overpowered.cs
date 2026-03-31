@@ -5217,7 +5217,7 @@ namespace Seralyth.Mods
 
         private static float freezeAllDelay;
         public static bool muteOnFreeze;
-        public static void FreezeServer(float delay = 0.1f, int eventCount = 11, RaiseEventOptions options = null)
+        public static void FreezeServer(float delay = 1f, int eventCount = 11, RaiseEventOptions options = null)
         {
             if (!PhotonNetwork.InRoom) return;
 
