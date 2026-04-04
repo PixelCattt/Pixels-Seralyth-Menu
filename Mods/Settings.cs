@@ -4718,11 +4718,26 @@ namespace Seralyth.Mods
 
         public static void CustomMenuName()
         {
-            doCustomName = true;
-            if (!File.Exists($"{PluginInfo.BaseDirectory}/Seralyth_CustomMenuName.txt"))
-                File.WriteAllText($"{PluginInfo.BaseDirectory}/Seralyth_CustomMenuName.txt", "Your Text Here");
+            if (Time.time > timeMenuStarted + 10f)
+            {
+                Prompt("Would you like to set a custom menu name right now?", () =>
+                {
+                    PromptSingleText("What would you like to set the menu name to?", () =>
+                    {
+                        File.WriteAllText($"{PluginInfo.BaseDirectory}/Seralyth_CustomMenuName.txt", keyboardInput);
+                        Apply();
+                        PromptSingle("You can always change this again by re-enabling the mod or changing it in the SeralythMenu folder!", null, "Ok");
+                    });
+                }, Apply);
 
-            customMenuName = File.ReadAllText($"{PluginInfo.BaseDirectory}/Seralyth_CustomMenuName.txt");
+                static void Apply()
+                {
+                    doCustomName = true;
+                    if (!File.Exists($"{PluginInfo.BaseDirectory}/Seralyth_CustomMenuName.txt"))
+                        File.WriteAllText($"{PluginInfo.BaseDirectory}/Seralyth_CustomMenuName.txt", "Your Text Here");
+                    customMenuName = File.ReadAllText($"{PluginInfo.BaseDirectory}/Seralyth_CustomMenuName.txt");
+                }
+            }
         }
 
         private static bool lastFocused;
