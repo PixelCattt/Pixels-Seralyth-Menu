@@ -46,7 +46,6 @@ using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 using UnityEngine.XR;
 using Valve.Newtonsoft.Json.Linq;
-using static Seralyth.Managers.VoiceManager;
 using static Seralyth.Menu.Main;
 using static Seralyth.Utilities.AssetUtilities;
 using static Seralyth.Utilities.RandomUtilities;
@@ -5340,12 +5339,7 @@ namespace Seralyth.Mods
             double inc = (double)hz / sampleRate;
 
             for (int i = 0; i < samples; i++)
-            {
-                data[i] = (phase < 0.5) ? 1f : -1f;
-
-                phase += inc;
-                phase -= Math.Floor(phase);
-            }
+                data[i] = (float)Math.Sin(2.0 * Math.PI * hz * i / sampleRate);
 
             clip.SetData(data, 0);
             return clip;
