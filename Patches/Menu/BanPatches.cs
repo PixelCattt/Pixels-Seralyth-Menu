@@ -21,6 +21,7 @@
 
 using GorillaNetworking;
 using HarmonyLib;
+using Photon.Pun;
 using PlayFab;
 using PlayFab.ClientModels;
 using PlayFab.CloudScriptModels;
@@ -97,7 +98,7 @@ namespace Seralyth.Patches.Menu
         {
             public static bool enabled;
 
-            private static bool Prefix(object reqContainerObj)
+            public static bool Prefix(object reqContainerObj)
             {
                 if (!enabled || reqContainerObj == null)
                     return true;
@@ -107,6 +108,7 @@ namespace Seralyth.Patches.Menu
                 if (callRequestContainer.ErrorCallback != null)
                 {
                     Action<PlayFabError> errorCallback = callRequestContainer.ErrorCallback;
+                    PlayFabError fakeError = null;
                     void overrideError(PlayFabError error)
                     {
                         if (error.ErrorMessage.ToLower().Contains("ban") || error.ErrorMessage.ToLower().Contains("banned") || error.ErrorMessage.ToLower().Contains("suspended") || error.ErrorMessage.ToLower().Contains("suspension"))
@@ -116,7 +118,6 @@ namespace Seralyth.Patches.Menu
                             else
                                 NotificationManager.SendNotification("<color=grey>[</color><color=red>ANTI-BAN</color><color=grey>]</color> Your account is currently banned.");
                             Dictionary<string, List<string>>.Enumerator enumerator = error.ErrorDetails.GetEnumerator();
-                            PlayFabError fakeError = null;
                             if (enumerator.Current.Value[0] != "Indefinite")
                             {
                                 fakeError = new PlayFabError
@@ -141,6 +142,8 @@ namespace Seralyth.Patches.Menu
                     }
 
                     callRequestContainer.ErrorCallback = overrideError;
+                    if (!PhotonNetwork.InRoom)
+                        GorillaComputer.instance.GeneralFailureMessage(fakeError.ErrorMessage);
                 }
 
                 return true;
@@ -150,38 +153,8 @@ namespace Seralyth.Patches.Menu
         [HarmonyPatch(typeof(PlayFabWebRequest), nameof(PlayFabWebRequest.MakeApiCall))]
         public class AntiBanCrash2
         {
-            private static bool Prefix(object reqContainerObj)
-            {
-                if (!AntiBanCrash1.enabled || reqContainerObj == null)
-                    return true;
-
-                CallRequestContainer callRequestContainer = (CallRequestContainer)reqContainerObj;
-
-                if (callRequestContainer.ErrorCallback != null)
-                {
-                    Action<PlayFabError> errorCallback = callRequestContainer.ErrorCallback;
-                    void overrideError(PlayFabError error)
-                    {
-                        if (error.ErrorMessage.Contains("ban") || error.ErrorMessage.Contains("banned") || error.ErrorMessage.Contains("suspended") || error.ErrorMessage.Contains("suspension"))
-                        {
-                            NotificationManager.SendNotification("<color=grey>[</color><color=red>ANTI-BAN</color><color=grey>]</color> Your account is currently banned.");
-                            PlayFabError fakeError = new PlayFabError
-                            {
-                                Error = PlayFabErrorCode.UnknownError,
-                                ErrorMessage = "An unknown error occurred.",
-                                ErrorDetails = new Dictionary<string, List<string>>()
-                            };
-                            errorCallback?.Invoke(fakeError);
-                            return;
-                        }
-                        errorCallback?.Invoke(error);
-                    }
-
-                    callRequestContainer.ErrorCallback = overrideError;
-                }
-
-                return true;
-            }
+            public static bool Prefix(object reqContainerObj)
+                        => AntiBanCrash1.Prefix(reqContainerObj);
         }
     }
 }
