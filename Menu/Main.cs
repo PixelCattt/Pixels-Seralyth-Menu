@@ -3354,7 +3354,7 @@ namespace Seralyth.Menu
 
             GetObject("Shoulder Camera").transform.Find("CM vcam1").gameObject.SetActive(true);
             if (dynamicSounds)
-                SoundManager.Play(SoundManager.DefaultSounds["Close"]);
+                SoundManager.Play(SoundManager.DefaultSounds["Close"], global: true);
 
             try
             {
