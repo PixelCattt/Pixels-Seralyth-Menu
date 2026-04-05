@@ -5335,7 +5335,6 @@ namespace Seralyth.Mods
             var clip = AudioClip.Create("tinnitus", samples, 1, sampleRate, false);
             var data = new float[samples];
 
-            double phase = 0.0;
             double inc = (double)hz / sampleRate;
 
             for (int i = 0; i < samples; i++)
