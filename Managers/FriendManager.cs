@@ -236,7 +236,7 @@ namespace Seralyth.Managers
                 {
                     if (menu != null)
                     {
-                        if (rightJoystickClick)
+                        if (rightJoystickClick && !joystickMenu)
                         {
                             if (pingObject == null)
                                 pingObject = new GameObject("Seralyth_PingLine");
