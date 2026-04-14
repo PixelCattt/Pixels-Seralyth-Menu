@@ -3,11 +3,11 @@
 
   My Modified Version of <b>Seralyth Menu</b> (ii's Stupid Menu)
 
-  <a href="https://github.com/PixelCattt/Pixels-Seralyth-Menu/compare/8.0.3...8.0.4">
+  <a href="https://github.com/PixelCattt/Pixels-Seralyth-Menu/compare/8.0.4...8.0.5">
     <img src="https://img.shields.io/badge/view-changes-lime?style=for-the-badge"</img>
   </a>
 
   <a href="https://github.com/PixelCattt/Pixels-Seralyth-Menu/releases">
-    <img src="https://img.shields.io/github/downloads/PixelCattt/Pixels-Seralyth-Menu/v8.0.4/Pixels-Seralyth-Menu.dll?style=for-the-badge&label=Downloads&color=lime"</img>
+    <img src="https://img.shields.io/github/downloads/PixelCattt/Pixels-Seralyth-Menu/v8.0.5/Pixels-Seralyth-Menu.dll?style=for-the-badge&label=Downloads&color=lime"</img>
   </a>
 </div>
