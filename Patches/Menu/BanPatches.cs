@@ -29,6 +29,7 @@ using PlayFab.Internal;
 using Seralyth.Managers;
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Seralyth.Patches.Menu
 {
@@ -143,7 +144,13 @@ namespace Seralyth.Patches.Menu
 
                     callRequestContainer.ErrorCallback = overrideError;
                     if (!PhotonNetwork.InRoom)
-                        GorillaComputer.instance.GeneralFailureMessage(fakeError.ErrorMessage);
+                        Task.Run(async () =>
+                        {
+                            while (GorillaComputer.instance == null)
+                                await Task.Delay(16);
+
+                            GorillaComputer.instance.GeneralFailureMessage(fakeError.ErrorMessage);
+                        });
                 }
 
                 return true;

@@ -56,7 +56,7 @@ namespace Seralyth.Patches.Menu
                     if (grounded)
                     {
                         Vector3 averageVelocity = (handLink.isLeftHand ? GTPlayer.Instance.LeftHand.velocityTracker : GTPlayer.Instance.RightHand.velocityTracker).GetAverageVelocity(true).normalized * 20f;
-                        __instance.myRig.netView.SendRPC("DroppedByPlayer", __instance.myRig.GetPlayer(), averageVelocity);
+                        __instance.myRig.GetNetView().SendRPC("DroppedByPlayer", __instance.myRig.GetPlayer(), averageVelocity);
                         __instance.myRig.ApplyLocalTrajectoryOverride(averageVelocity);
                     }
 

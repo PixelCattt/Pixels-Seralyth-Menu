@@ -357,7 +357,7 @@ namespace Seralyth.Mods
                             if (targets.Contains(NetworkSystem.Instance.LocalPlayer.ActorNumber))
                                 ObjectPools.instance.Instantiate(GTPlayer.Instance.waterParams.rippleEffect, splashPosition, splashRotation, GTPlayer.Instance.waterParams.rippleEffectScale * boundingRadius * 2f);
 
-                            Overpowered.SpecialTargetRPC(GorillaTagger.Instance.myVRRig.GetView, "RPC_PlaySplashEffect", new RaiseEventOptions { TargetActors = targets }, parameters);
+                            VRRig.LocalRig.GetPhotonView().RPC("RPC_PlaySplashEffect", new RaiseEventOptions { TargetActors = targets }, parameters);
                             break;
                         }
                 }
@@ -1082,16 +1082,15 @@ namespace Seralyth.Mods
 
                 if (GorillaTagger.Instance.myVRRig != null && isNearReportButton)
                 {
-                    MassSerialize(true, new PhotonView[] { GorillaTagger.Instance.myVRRig.GetView });
+                    MassSerialize(true, new PhotonView[] { VRRig.LocalRig.GetPhotonView() });
 
                     Vector3 positionArchiveLeft = VRRig.LocalRig.leftHand.rigTarget.transform.position;
                     Vector3 positionArchiveRight = VRRig.LocalRig.rightHand.rigTarget.transform.position;
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions() { TargetActors = PhotonNetwork.PlayerListOthers.Where(player => !people.ToArray().Contains(player.ActorNumber)).Select(player => player.ActorNumber).ToArray() });
-
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions() { TargetActors = PhotonNetwork.PlayerListOthers.Where(player => !people.ToArray().Contains(player.ActorNumber)).Select(player => player.ActorNumber).ToArray() });
                     VRRig.LocalRig.leftHand.rigTarget.transform.position = GorillaTagger.Instance.headCollider.transform.position - (GorillaTagger.Instance.headCollider.transform.forward * 100f);
                     VRRig.LocalRig.rightHand.rigTarget.transform.position = GorillaTagger.Instance.headCollider.transform.position - (GorillaTagger.Instance.headCollider.transform.forward * 100f);
 
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions() { TargetActors = people.ToArray() });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions() { TargetActors = people.ToArray() });
 
                     VRRig.LocalRig.leftHand.rigTarget.transform.position = positionArchiveLeft;
                     VRRig.LocalRig.rightHand.rigTarget.transform.position = positionArchiveRight;
@@ -1226,7 +1225,7 @@ namespace Seralyth.Mods
                     VRRig.LocalRig.enabled = false;
 
                     VRRig.LocalRig.transform.position = NewPointer.transform.position + (Vector3.up * (Time.frameCount % 2 == 1 ? 10f : -10f));
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView);
+                    SendSerialize(VRRig.LocalRig.GetPhotonView());
 
                     VRRig.LocalRig.transform.position = NewPointer.transform.position + (Vector3.up * (Time.frameCount % 2 == 1 ? 10f : 0f));
                 }
@@ -1403,7 +1402,7 @@ namespace Seralyth.Mods
             if (rightTrigger > 0.5f && Time.time > lastTimeDingied)
             {
                 lastTimeDingied = Time.time + VRRig.LocalRig.fxSettings.GetDelay(10);
-                GetAllType<MonkeBusinessStation>().FirstOrDefault().photonView.RPC("BroadcastRedeemQuestPoints", RpcTarget.All, 50);
+                RoomSystem.SendMonkePointsRedeemed(50);
             }
         }
 
@@ -2820,7 +2819,7 @@ Piece Name: {gunTarget.name}";
             {
                 if (PhotonNetwork.InRoom)
                 {
-                    MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                    MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                     List<SnowballThrowable> activeSnowballs = new List<SnowballThrowable>();
 
@@ -2829,7 +2828,7 @@ Piece Name: {gunTarget.name}";
 
                     if (activeSnowballs.Count <= 0)
                     {
-                        SendSerialize(GorillaTagger.Instance.myVRRig.GetView);
+                        SendSerialize(VRRig.LocalRig.GetPhotonView());
                         return false;
                     }
 
@@ -2837,7 +2836,7 @@ Piece Name: {gunTarget.name}";
                         snowball.SetSnowballActiveLocal(false);
 
                     VRRig.LocalRig.reliableState.SetIsDirty();
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView);
+                    SendSerialize(VRRig.LocalRig.GetPhotonView());
 
                     foreach (SnowballThrowable snowball in activeSnowballs)
                     {
@@ -2851,7 +2850,7 @@ Piece Name: {gunTarget.name}";
                     }
 
                     VRRig.LocalRig.reliableState.SetIsDirty();
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView);
+                    SendSerialize(VRRig.LocalRig.GetPhotonView());
 
                     return false;
                 }
@@ -3077,14 +3076,14 @@ Piece Name: {gunTarget.name}";
             {
                 if (PhotonNetwork.InRoom)
                 {
-                    MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                    MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                     Vector3 archivePos = VRRig.LocalRig.transform.position;
 
                     foreach (NetPlayer Player in NetworkSystem.Instance.PlayerListOthers)
                     {
                         HoverboardScreenTarget(GetVRRigFromPlayer(Player), color);
-                        SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                        SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                     }
 
                     RPCProtection();
@@ -4577,13 +4576,13 @@ Piece Name: {gunTarget.name}";
                 Vector3 archivePosition = VRRig.LocalRig.transform.position;
                 VRRig.LocalRig.transform.position = pos;
 
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView, null, -10);
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView);
+                SendSerialize(VRRig.LocalRig.GetPhotonView(), null, -10);
+                SendSerialize(VRRig.LocalRig.GetPhotonView());
 
                 projectile._events.Activate.RaiseAll(pos, rot, vel, 1f);
 
                 VRRig.LocalRig.transform.position = archivePosition;
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView);
+                SendSerialize(VRRig.LocalRig.GetPhotonView());
 
                 RPCProtection();
             }

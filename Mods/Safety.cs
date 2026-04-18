@@ -709,7 +709,7 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 leftHandPosition = VRRig.LocalRig.leftHand.rigTarget.localPosition;
                 Vector3 rightHandPosition = VRRig.LocalRig.rightHand.rigTarget.localPosition;
@@ -720,7 +720,7 @@ namespace Seralyth.Mods
                 VRRig.LocalRig.leftHand.rigTarget.localPosition = smoothedLeftHandPosition;
                 VRRig.LocalRig.rightHand.rigTarget.localPosition = smoothedRightHandPosition;
 
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView);
+                SendSerialize(VRRig.LocalRig.GetPhotonView());
 
                 VRRig.LocalRig.leftHand.rigTarget.localPosition = leftHandPosition;
                 VRRig.LocalRig.rightHand.rigTarget.localPosition = rightHandPosition;

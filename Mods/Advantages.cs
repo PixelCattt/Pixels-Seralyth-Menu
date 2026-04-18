@@ -78,11 +78,11 @@ namespace Seralyth.Mods
                             if (VRRig.LocalRig.IsTagged())
                                 return true;
 
-                            MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                            MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                             Vector3 positionArchive = VRRig.LocalRig.transform.position;
                             VRRig.LocalRig.transform.position = rig.rightHandTransform.transform.position;
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber, rig.GetPlayer().ActorNumber } });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber, rig.GetPlayer().ActorNumber } });
 
                             RPCProtection();
                             VRRig.LocalRig.transform.position = positionArchive;
@@ -323,13 +323,18 @@ namespace Seralyth.Mods
 
         public static void SetTagCooldown(float value)
         {
-            if (!NetworkSystem.Instance.IsMasterClient || !NetworkSystem.Instance.InRoom)
-                Overpowered.LagMasterClient();
-            else
+            if (!NetworkSystem.Instance.InRoom)
             {
-                GorillaTagManager tagman = (GorillaTagManager)GorillaGameManager.instance;
-                tagman.tagCoolDown = value;
+                NotificationManager.SendNotification("<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> You are not in a room.");
+                return;
             }
+            if (!NetworkSystem.Instance.IsMasterClient)
+            {
+                NotificationManager.SendNotification("<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> You are not master client.");
+                return;
+            }
+            GorillaTagManager tagman = (GorillaTagManager)GorillaGameManager.instance;
+            tagman.tagCoolDown = value;
         }
 
         public static float tagAuraDistance = 1.666f;
@@ -762,7 +767,7 @@ namespace Seralyth.Mods
             Vector3 archiveRigPosition = VRRig.LocalRig.transform.position;
             VRRig.LocalRig.transform.position = GetVRRigFromPlayer(Target).transform.position;
 
-            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
+            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
             GameMode.ReportTag(Target);
 
             VRRig.LocalRig.transform.position = archiveRigPosition;
@@ -803,13 +808,13 @@ namespace Seralyth.Mods
             foreach (var vrrig in VRRigCache.ActiveRigs.Where(vrrig => !vrrig.IsTagged()))
             {
                 VRRig.LocalRig.transform.position = vrrig.transform.position;
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
+                SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
                 GameMode.ReportTag(GetPlayerFromVRRig(vrrig));
             }
 
             VRRig.LocalRig.transform.position = archiveRigPosition;
 
-            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
+            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
             RPCProtection();
         }
 
@@ -908,13 +913,13 @@ namespace Seralyth.Mods
                 if (VRRig.LocalRig.IsTagged())
                     return true;
 
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 positionArchive = VRRig.LocalRig.transform.position;
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != PhotonNetwork.MasterClient.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
+                SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != PhotonNetwork.MasterClient.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
 
                 VRRig.LocalRig.transform.position = new Vector3(99999f, 99999f, 99999f);
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
+                SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
 
                 RPCProtection();
                 VRRig.LocalRig.transform.position = positionArchive;

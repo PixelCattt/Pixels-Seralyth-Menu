@@ -1920,8 +1920,8 @@ namespace Seralyth.Menu
                 new ButtonInfo { buttonText = "Empty Lava", method =() => Overpowered.ChangeLavaState(InfectionLavaController.RisingLavaState.Drained), isTogglable = false, toolTip = "Makes the lava in the forest lava map drained."},
                 new ButtonInfo { buttonText = "Erupt Lava", method =() => Overpowered.ChangeLavaState(InfectionLavaController.RisingLavaState.Erupting), isTogglable = false, toolTip = "Erupts the lava in the forest lava map."},
 
-                new ButtonInfo { buttonText = "Lava Swim Gun", method = Overpowered.LavaSwimGun, toolTip = "Allows whoever your hand desires to swim in lava."},
-                new ButtonInfo { buttonText = "Lava Swim All", method = Overpowered.LavaSwimGun, toolTip = "Makes everyone swim in lava."},
+                //new ButtonInfo { buttonText = "Lava Swim Gun", method = Overpowered.LavaSwimGun, toolTip = "Allows whoever your hand desires to swim in lava."},
+                //new ButtonInfo { buttonText = "Lava Swim All", method = Overpowered.LavaSwimGun, toolTip = "Makes everyone swim in lava."},
 
                 new ButtonInfo { buttonText = "Kill Self", method =() => Fun.SetStateSelf(1), isTogglable = false, toolTip = "Turns you into a ghost."},
                 new ButtonInfo { buttonText = "Kill Gun", method =() => Fun.SetStateGun(1), toolTip = "Turns whoever your hand desires into a ghost."},
@@ -2088,6 +2088,9 @@ namespace Seralyth.Menu
                 new ButtonInfo { buttonText = "Delay Ban Gun", method = Overpowered.DelayBanGun, disableMethod =() => SerializePatch.OverrideSerialization = null, toolTip = "Delay bans whoever your hand desires."},
                 new ButtonInfo { buttonText = "Delay Ban All", enableMethod = Overpowered.DelayBanAll, disableMethod =() => SerializePatch.OverrideSerialization = null, toolTip = "Delay bans everyone in the room."},
 
+                new ButtonInfo { buttonText = "Kick Gun", method =() => Overpowered.KickGun(), disableMethod =() => Overpowered.kickCoroutine = null, toolTip = "Kicks whoever your hand desires."},
+                new ButtonInfo { buttonText = "Kick All", enableMethod =() => Overpowered.KickAll(), disableMethod =() => Overpowered.kickCoroutine = null, toolTip = "Kicks everyone in the room."},
+
                 new ButtonInfo { buttonText = "Force Grab", method = Overpowered.ForceGrab, toolTip = "Attempts to grab the hand of anyone who presses their grips." },
                 new ButtonInfo { buttonText = "Fling on Grab", method = Overpowered.FlingOnGrab, toolTip = "Flings the player when they grab you." },
                 new ButtonInfo { buttonText = "Kick on Grab", method =() => Overpowered.TowardsPositionOnGrab(new Vector3(-71.33718f, 101.4977f, -93.09029f)), toolTip = "Kicks the player when they grab you." },
@@ -2153,10 +2156,10 @@ namespace Seralyth.Menu
                 new ButtonInfo { buttonText = "Leave Party", method =() => FriendshipGroupDetection.Instance.LeaveParty(), isTogglable = false, toolTip = "Leaves the party, incase you can't pull off the string." },
                 new ButtonInfo { buttonText = "Party Break Network Triggers", method = Overpowered.PartyBreakNetworkTriggers, toolTip = "Breaks the network triggers for anyone in your party." },
 
-                new ButtonInfo { buttonText = "Party Kick Gun", method = Overpowered.PartyKickGun, disableMethod =() => Overpowered.OptimizeEvents = false, toolTip = "Kicks whoever your hand desires if they're in your party from the room."},
-                new ButtonInfo { buttonText = "Party Kick All", method = Overpowered.PartyKickAll, disableMethod =() => Overpowered.OptimizeEvents = false, toolTip = "Kicks everyone in your party from the room."},
-                new ButtonInfo { buttonText = "Party Kick Aura", method = Overpowered.PartyKickAura, disableMethod =() => Overpowered.OptimizeEvents = false, toolTip = "Kicks nearby party members from the room."},
-                new ButtonInfo { buttonText = "Party Kick On Touch", method = Overpowered.PartyKickOnTouch, disableMethod =() => Overpowered.OptimizeEvents = false, toolTip = "Kicks party members you touch from the room."},
+                new ButtonInfo { buttonText = "Party Kick Gun", method = Overpowered.PartyKickGun, disableMethod =() => SerializePatch.OverrideSerialization = null, toolTip = "Kicks whoever your hand desires if they're in your party from the room."},
+                new ButtonInfo { buttonText = "Party Kick All", method = Overpowered.PartyKickAll, disableMethod =() => SerializePatch.OverrideSerialization = null, toolTip = "Kicks everyone in your party from the room."},
+                new ButtonInfo { buttonText = "Party Kick Aura", method = Overpowered.PartyKickAura, disableMethod =() => SerializePatch.OverrideSerialization = null, toolTip = "Kicks nearby party members from the room."},
+                new ButtonInfo { buttonText = "Party Kick On Touch", method = Overpowered.PartyKickOnTouch, disableMethod =() => SerializePatch.OverrideSerialization = null, toolTip = "Kicks party members you touch from the room."},
 
                 new ButtonInfo { buttonText = "Kick All in Party", overlapText = "Party Send All", method = Overpowered.KickAllInParty, isTogglable = false, toolTip = "Sends everyone in your party to a random room." },
                 new ButtonInfo { buttonText = "Ban All in Party", overlapText = "Party Ban All", method = Overpowered.BanAllInParty, isTogglable = false, toolTip = "Sends everyone in your party to a bannable code." },

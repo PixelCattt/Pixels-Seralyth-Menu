@@ -1366,7 +1366,7 @@ namespace Seralyth.Mods
             {
                 if (PhotonNetwork.InRoom)
                 {
-                    MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                    MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                     Vector3 archivePos = VRRig.LocalRig.transform.position;
 
@@ -1375,7 +1375,7 @@ namespace Seralyth.Mods
                         VRRig rig = GetVRRigFromPlayer(Player);
                         VRRig.LocalRig.transform.position = rig.transform.position - Vector3.one * 3f;
 
-                        SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                        SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
 
                         BetaFireProjectile("EggLeftHand_Anchor Variant", rig.headMesh.transform.position + new Vector3(0f, 0.1f, 0f), new Vector3(0f, -15f, 0f), Color.black, new RaiseEventOptions { TargetActors = new[] { NetPlayerToPlayer(GetPlayerFromVRRig(rig)).ActorNumber } }, true);
                     }
@@ -1434,7 +1434,7 @@ namespace Seralyth.Mods
             {
                 if (PhotonNetwork.InRoom)
                 {
-                    MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                    MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                     Vector3 archivePos = VRRig.LocalRig.transform.position;
 
@@ -1443,7 +1443,7 @@ namespace Seralyth.Mods
                         VRRig rig = GetVRRigFromPlayer(Player);
                         VRRig.LocalRig.transform.position = rig.transform.position - Vector3.one * 3f;
 
-                        SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                        SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
 
                         BetaFireProjectile("Fireworks_Anchor Variant_Left Hand", rig.headMesh.transform.position + new Vector3(0f, 0.1f, 0f) + rig.headMesh.transform.forward * -0.7f, new Vector3(0f, 15f, 0f), Color.black, new RaiseEventOptions { TargetActors = new[] { NetPlayerToPlayer(GetPlayerFromVRRig(rig)).ActorNumber } }, true);
                     }

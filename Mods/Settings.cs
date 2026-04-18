@@ -4747,6 +4747,8 @@ namespace Seralyth.Mods
                 NotificationManager.SendNotification("<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> You are not focused on Gorilla Tag. Voice transcription mods will not function. Please focus/click on the game.");
 
             lastFocused = Application.isFocused;
+            if (Application.isFocused && lastFocused)
+                DictationRestart();
         }
 
         // Thanks to kingofnetflix for inspiration and support with voice recognition

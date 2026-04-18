@@ -43,22 +43,6 @@ namespace Seralyth.Patches.Safety
         }
 
         [PatchOnAwake]
-        [HarmonyPatch(typeof(GorillaTelemetry), nameof(GorillaTelemetry.EnqueueTelemetryEventPlayFab))]
-        public class EnqueueTelemetryEventPlayFab
-        {
-            private static bool Prefix(EventContents eventContent) =>
-                !enabled;
-        }
-
-        [PatchOnAwake]
-        [HarmonyPatch(typeof(GorillaTelemetry), nameof(GorillaTelemetry.FlushPlayFabTelemetry))]
-        public class FlushPlayFabTelemetry
-        {
-            private static bool Prefix() =>
-                !enabled;
-        }
-
-        [PatchOnAwake]
         [HarmonyPatch(typeof(GorillaTelemetry), nameof(GorillaTelemetry.FlushMothershipTelemetry))]
         public class FlushMothershipTelemetry
         {

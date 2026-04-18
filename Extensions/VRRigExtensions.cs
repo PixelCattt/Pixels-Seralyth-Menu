@@ -145,6 +145,12 @@ namespace Seralyth.Extensions
         public static Photon.Realtime.Player GetPhotonPlayer(this VRRig rig) =>
             RigUtilities.NetPlayerToPlayer(RigUtilities.GetPlayerFromVRRig(rig));
 
+        public static NetworkView GetNetView(this VRRig rig) =>
+            rig.netView;
+
+        public static PhotonView GetPhotonView(this VRRig rig) =>
+            rig.netView.GetView;
+
         public static ProjectileWeapon GetSlingshot(this VRRig rig) =>
             rig.projectileWeapon;
 

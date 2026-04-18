@@ -3605,13 +3605,13 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Quaternion headRotArchive = VRRig.LocalRig.head.rigTarget.transform.rotation;
                 foreach (NetPlayer Player in NetworkSystem.Instance.PlayerListOthers)
                 {
                     VRRig.LocalRig.head.rigTarget.transform.rotation = Quaternion.LookRotation(Vector3.Normalize(GetVRRigFromPlayer(Player).headMesh.transform.position));
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -4635,14 +4635,14 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
 
                 foreach (NetPlayer Player in NetworkSystem.Instance.PlayerListOthers)
                 {
                     VRRig.LocalRig.transform.position = GetVRRigFromPlayer(Player).headMesh.transform.position;
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -4723,7 +4723,7 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
                 Quaternion archiveRot = VRRig.LocalRig.transform.rotation;
@@ -4739,7 +4739,7 @@ namespace Seralyth.Mods
                 foreach (NetPlayer Player in NetworkSystem.Instance.PlayerListOthers)
                 {
                     CopyMovementPlayer(Player, false);
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -4838,7 +4838,7 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
                 Quaternion archiveRot = VRRig.LocalRig.transform.rotation;
@@ -4878,7 +4878,7 @@ namespace Seralyth.Mods
 
                     FixRigHandRotation();
 
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -4961,7 +4961,7 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
                 Quaternion archiveRot = VRRig.LocalRig.transform.rotation;
@@ -4988,7 +4988,7 @@ namespace Seralyth.Mods
                     VRRig.LocalRig.leftHand.rigTarget.transform.rotation = VRRig.LocalRig.transform.rotation;
                     VRRig.LocalRig.rightHand.rigTarget.transform.rotation = VRRig.LocalRig.transform.rotation;
 
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -5075,7 +5075,7 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
                 Quaternion archiveRot = VRRig.LocalRig.transform.rotation;
@@ -5106,7 +5106,7 @@ namespace Seralyth.Mods
                     VRRig.LocalRig.leftHand.rigTarget.transform.rotation = Quaternion.Euler(VRRig.LocalRig.transform.rotation.eulerAngles + new Vector3(0f, 180f, 0f));
                     VRRig.LocalRig.rightHand.rigTarget.transform.rotation = Quaternion.Euler(VRRig.LocalRig.transform.rotation.eulerAngles + new Vector3(0f, 180f, 0f));
 
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -5191,7 +5191,7 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
                 Quaternion archiveRot = VRRig.LocalRig.transform.rotation;
@@ -5220,7 +5220,7 @@ namespace Seralyth.Mods
                     VRRig.LocalRig.leftHand.rigTarget.transform.rotation = RandomQuaternion();
                     VRRig.LocalRig.rightHand.rigTarget.transform.rotation = RandomQuaternion();
 
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -5283,7 +5283,7 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
 
@@ -5292,7 +5292,7 @@ namespace Seralyth.Mods
                     VRRig targetRig = GetVRRigFromPlayer(Player);
 
                     VRRig.LocalRig.transform.position = targetRig.transform.position - Vector3.up * 2f;
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -5376,14 +5376,14 @@ namespace Seralyth.Mods
                         SerializePatch.OverrideSerialization = () =>
                         {
                             NetPlayer target = GetPlayerFromVRRig(lockTarget);
-                            MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                            MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                             Vector3 positionArchive = VRRig.LocalRig.transform.position;
                             VRRig.LocalRig.transform.position = lockTarget.transform.position - (lockTarget.headMesh.transform.forward * 0.2f);
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { target.ActorNumber } });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { target.ActorNumber } });
 
                             VRRig.LocalRig.transform.position = new Vector3(Random.Range(-99999f, 99999f), 99999f, Random.Range(-99999f, 99999f));
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != target.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != target.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
 
                             RPCProtection();
                             VRRig.LocalRig.transform.position = positionArchive;
@@ -5414,7 +5414,7 @@ namespace Seralyth.Mods
 
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
 
@@ -5423,7 +5423,7 @@ namespace Seralyth.Mods
                     VRRig targetRig = GetVRRigFromPlayer(Player);
 
                     VRRig.LocalRig.transform.position = targetRig.transform.position - (targetRig.headMesh.transform.forward * 0.2f);
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -5511,15 +5511,15 @@ namespace Seralyth.Mods
                         SerializePatch.OverrideSerialization = () =>
                         {
                             NetPlayer target = GetPlayerFromVRRig(lockTarget);
-                            MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                            MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                             Vector3 positionArchive = VRRig.LocalRig.transform.position;
                             VRRig.LocalRig.transform.position = lockTarget.transform.position + RandomVector3();
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { target.ActorNumber } });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { target.ActorNumber } });
 
                             RPCProtection();
                             VRRig.LocalRig.transform.position = positionArchive;
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != target.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != target.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
 
                             return false;
                         };
@@ -5540,13 +5540,13 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization ??= () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
                 foreach (NetPlayer Player in NetworkSystem.Instance.PlayerListOthers)
                 {
                     VRRig targetRig = GetVRRigFromPlayer(Player);
                     VRRig.LocalRig.transform.position = targetRig.transform.position + RandomVector3();
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
                 RPCProtection();
                 VRRig.LocalRig.transform.position = archivePos;
@@ -5653,13 +5653,13 @@ namespace Seralyth.Mods
                         SerializePatch.OverrideSerialization = () =>
                         {
                             NetPlayer target = GetPlayerFromVRRig(lockTarget);
-                            MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                            MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                             Vector3 positionArchive = VRRig.LocalRig.transform.position;
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != target.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != target.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
 
                             VRRig.LocalRig.transform.position = new Vector3(Random.Range(-99999f, 99999f), 99999f, Random.Range(-99999f, 99999f));
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { target.ActorNumber } });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { target.ActorNumber } });
 
                             RPCProtection();
                             VRRig.LocalRig.transform.position = positionArchive;
@@ -5697,13 +5697,13 @@ namespace Seralyth.Mods
                         SerializePatch.OverrideSerialization = () =>
                         {
                             NetPlayer target = GetPlayerFromVRRig(lockTarget);
-                            MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                            MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                             Vector3 positionArchive = VRRig.LocalRig.transform.position;
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { target.ActorNumber } });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { target.ActorNumber } });
 
                             VRRig.LocalRig.transform.position = new Vector3(Random.Range(-99999f, 99999f), 99999f, Random.Range(-99999f, 99999f));
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != target.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => plr.ActorNumber != target.ActorNumber).Select(plr => plr.ActorNumber).ToArray() });
 
                             RPCProtection();
                             VRRig.LocalRig.transform.position = positionArchive;
@@ -5822,7 +5822,7 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
                 Quaternion archiveRot = VRRig.LocalRig.transform.rotation;
@@ -5866,7 +5866,7 @@ namespace Seralyth.Mods
 
                     FixRigHandRotation();
 
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -6061,7 +6061,7 @@ namespace Seralyth.Mods
         {
             SerializePatch.OverrideSerialization = () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
                 Quaternion archiveRot = VRRig.LocalRig.transform.rotation;
@@ -6107,7 +6107,7 @@ namespace Seralyth.Mods
 
                     FixRigHandRotation();
 
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();

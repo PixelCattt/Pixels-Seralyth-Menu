@@ -68,7 +68,6 @@ namespace Seralyth.Patches
                     PatchErrors++;
                     if (type.GetCustomAttribute<SecurityPatch>() != null)
                         CriticalPatchFailed = true;
-                    CriticalPatchFailed = true;
                     LogManager.LogError($"Failed to patch {type.FullName}: {ex}");
                 }
             }

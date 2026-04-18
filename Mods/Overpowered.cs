@@ -27,6 +27,7 @@ using GorillaLocomotion.Gameplay;
 using GorillaNetworking;
 using GorillaTagScripts;
 using GorillaTagScripts.VirtualStumpCustomMaps;
+using HarmonyLib;
 using Ionic.Zlib;
 using Photon.Pun;
 using Photon.Realtime;
@@ -43,6 +44,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static Seralyth.Menu.Main;
@@ -1024,16 +1026,16 @@ namespace Seralyth.Mods
                         SerializePatch.OverrideSerialization = () =>
                         {
                             GetPlayerFromVRRig(lockTarget);
-                            MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                            MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                             Vector3 positionArchive = VRRig.LocalRig.transform.position;
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => !(new[] { PhotonNetwork.MasterClient.ActorNumber, GetPlayerFromVRRig(lockTarget).ActorNumber }).Contains(plr.ActorNumber)).Select(plr => plr.ActorNumber).ToArray() });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(plr => !(new[] { PhotonNetwork.MasterClient.ActorNumber, GetPlayerFromVRRig(lockTarget).ActorNumber }).Contains(plr.ActorNumber)).Select(plr => plr.ActorNumber).ToArray() });
 
                             VRRig.LocalRig.transform.position = new Vector3(99999f, 99999f, 99999f);
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
 
                             VRRig.LocalRig.transform.position = lockTarget.rightHandTransform.position;
-                            SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { GetPlayerFromVRRig(lockTarget).ActorNumber } });
+                            SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { GetPlayerFromVRRig(lockTarget).ActorNumber } });
 
                             RPCProtection();
                             VRRig.LocalRig.transform.position = positionArchive;
@@ -1070,13 +1072,13 @@ namespace Seralyth.Mods
                 }
 
                 GetPlayerFromVRRig(lockTarget);
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 positionArchive = VRRig.LocalRig.transform.position;
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(player => !player.IsMasterClient && player.VRRig().IsTagged()).Select(player => player.ActorNumber).ToArray() });
+                SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = PhotonNetwork.PlayerList.Where(player => !player.IsMasterClient && player.VRRig().IsTagged()).Select(player => player.ActorNumber).ToArray() });
 
                 VRRig.LocalRig.transform.position = new Vector3(99999f, 99999f, 99999f);
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
+                SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { PhotonNetwork.MasterClient.ActorNumber } });
 
                 foreach (NetPlayer player in NetworkSystem.Instance.PlayerListOthers)
                 {
@@ -1084,7 +1086,7 @@ namespace Seralyth.Mods
                     if (!player.IsMasterClient && rig.IsTagged())
                     {
                         VRRig.LocalRig.transform.position = rig.rightHandTransform.position;
-                        SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { player.ActorNumber } });
+                        SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { player.ActorNumber } });
                     }
                 }
 
@@ -2271,7 +2273,7 @@ namespace Seralyth.Mods
                 SerializePatch.OverrideSerialization = null;
             else SerializePatch.OverrideSerialization ??= () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
 
@@ -2280,7 +2282,7 @@ namespace Seralyth.Mods
                     VRRig targetRig = GetVRRigFromPlayer(Player);
 
                     VRRig.LocalRig.transform.position = targetRig.transform.position - Vector3.up;
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -2330,7 +2332,7 @@ namespace Seralyth.Mods
                 SerializePatch.OverrideSerialization = null;
             else SerializePatch.OverrideSerialization ??= () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
 
@@ -2339,7 +2341,7 @@ namespace Seralyth.Mods
                     VRRig targetRig = GetVRRigFromPlayer(Player);
 
                     VRRig.LocalRig.transform.position = targetRig.transform.position - Vector3.up;
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -2389,7 +2391,7 @@ namespace Seralyth.Mods
                 SerializePatch.OverrideSerialization = null;
             else SerializePatch.OverrideSerialization ??= () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
 
@@ -2398,7 +2400,7 @@ namespace Seralyth.Mods
                     VRRig targetRig = GetVRRigFromPlayer(Player);
 
                     VRRig.LocalRig.transform.position = targetRig.transform.position - Vector3.up;
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -2448,7 +2450,7 @@ namespace Seralyth.Mods
                 SerializePatch.OverrideSerialization = null;
             else SerializePatch.OverrideSerialization ??= () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
 
@@ -2457,7 +2459,7 @@ namespace Seralyth.Mods
                     VRRig targetRig = GetVRRigFromPlayer(Player);
 
                     VRRig.LocalRig.transform.position = targetRig.transform.position - Vector3.up;
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -2507,7 +2509,7 @@ namespace Seralyth.Mods
                 SerializePatch.OverrideSerialization = null;
             else SerializePatch.OverrideSerialization ??= () =>
             {
-                MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                 Vector3 archivePos = VRRig.LocalRig.transform.position;
 
@@ -2516,7 +2518,7 @@ namespace Seralyth.Mods
                     VRRig targetRig = GetVRRigFromPlayer(Player);
 
                     VRRig.LocalRig.transform.position = targetRig.transform.position - Vector3.up;
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), new RaiseEventOptions { TargetActors = new[] { Player.ActorNumber } });
                 }
 
                 RPCProtection();
@@ -3128,7 +3130,7 @@ namespace Seralyth.Mods
                 Lurker.currentState = LurkerGhost.ghostState.seek;
                 SerializePatch.OverrideSerialization = () =>
                 {
-                    MassSerialize(true, new[] { GorillaTagger.Instance.myVRRig.GetView });
+                    MassSerialize(true, new[] { VRRig.LocalRig.GetPhotonView() });
 
                     foreach (NetPlayer Player in NetworkSystem.Instance.PlayerListOthers)
                     {
@@ -3589,8 +3591,8 @@ namespace Seralyth.Mods
 
                 if (NoTeleportSnowballs && isTooFar)
                 {
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, options, -10);
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, options);
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), options, -10);
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), options);
                 }
 
                 for (int i = 0; i < (ignoreMultiply ? 1 : snowballMultiplicationFactor); i++)
@@ -3634,7 +3636,7 @@ namespace Seralyth.Mods
                 if (NoTeleportSnowballs && isTooFar)
                 {
                     VRRig.LocalRig.transform.position = archivePosition;
-                    SendSerialize(GorillaTagger.Instance.myVRRig.GetView, options);
+                    SendSerialize(VRRig.LocalRig.GetPhotonView(), options);
                 }
             }
             catch (Exception e)
@@ -4754,48 +4756,6 @@ namespace Seralyth.Mods
             }
         }
 
-        public static bool SpecialTargetRPC(PhotonView photonView, string method, RaiseEventOptions options, params object[] parameters)
-        {
-            if (photonView != null && parameters != null && !string.IsNullOrEmpty(method))
-            {
-                Hashtable rpcData = new Hashtable
-                {
-                    { 0, photonView.ViewID },
-                    { 2, PhotonNetwork.ServerTimestamp },
-                    { 3, method },
-                    { 4, parameters }
-                };
-
-                if (photonView.Prefix > 0)
-                    rpcData[1] = (short)photonView.Prefix;
-
-                if (PhotonNetwork.PhotonServerSettings.RpcList.Contains(method))
-                    rpcData[5] = (byte)PhotonNetwork.PhotonServerSettings.RpcList.IndexOf(method);
-
-                if (options.Receivers == ReceiverGroup.All || (options.TargetActors != null && options.TargetActors.Contains(NetworkSystem.Instance.LocalPlayer.ActorNumber)))
-                {
-                    if (options.Receivers == ReceiverGroup.All)
-                        options.Receivers = ReceiverGroup.Others;
-
-                    if (options.TargetActors != null && options.TargetActors.Contains(NetworkSystem.Instance.LocalPlayer.ActorNumber))
-                        options.TargetActors = options.TargetActors.Where(id => id != NetworkSystem.Instance.LocalPlayer.ActorNumber).ToArray();
-
-                    PhotonNetwork.ExecuteRpc(rpcData, PhotonNetwork.LocalPlayer);
-                }
-
-                else
-                {
-                    PhotonNetwork.NetworkingClient.LoadBalancingPeer.OpRaiseEvent(200, rpcData, options, new SendOptions
-                    {
-                        Reliability = true,
-                        DeliveryMode = DeliveryMode.ReliableUnsequenced,
-                        Encrypt = false
-                    });
-                }
-            }
-            return false;
-        }
-
         public static bool SpecialTimeRPC(PhotonView photonView, int timeOffset, string method, RaiseEventOptions options, params object[] parameters)
         {
             if (photonView != null && parameters != null && !string.IsNullOrEmpty(method))
@@ -5271,7 +5231,7 @@ namespace Seralyth.Mods
             if (Time.time > freezeAllDelay)
             {
                 for (int i = 0; i < eventCount; i++)
-                    PhotonNetwork.RaiseEvent(54, new object[] { serverLink }, options, SendOptions.SendUnreliable);
+                    PhotonNetwork.RaiseEvent(118, new object[] { serverLink }, options, SendOptions.SendUnreliable);
 
                 RPCProtection();
                 freezeAllDelay = Time.time + delay;
@@ -5833,8 +5793,8 @@ namespace Seralyth.Mods
                 Vector3 archivePosition = VRRig.LocalRig.transform.position;
 
                 VRRig.LocalRig.transform.position = pos;
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView, options, -50);
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView, options);
+                SendSerialize(VRRig.LocalRig.GetPhotonView(), options, -50);
+                SendSerialize(VRRig.LocalRig.GetPhotonView(), options);
 
                 vel = vel.ClampMagnitudeSafe(50f);
 
@@ -5845,13 +5805,13 @@ namespace Seralyth.Mods
                     PhotonNetwork.ServerTimestamp,
                     BitPackUtils.PackWorldPosForNetwork(pos),
                     BitPackUtils.PackQuaternionForNetwork(rot),
-                    BitPackUtils.PackWorldPosForNetwork(vel * 100f)
+                    BitPackUtils.PackWorldPosForNetwork(vel)
                 };
 
                 PhotonNetwork.RaiseEvent(177, data, options, SendOptions.SendReliable);
 
                 VRRig.LocalRig.transform.position = archivePosition;
-                SendSerialize(GorillaTagger.Instance.myVRRig.GetView, options);
+                SendSerialize(VRRig.LocalRig.GetPhotonView(), options);
 
                 RPCProtection();
             }
@@ -6297,7 +6257,7 @@ namespace Seralyth.Mods
             NotificationManager.SendNotification($"<color=grey>[</color><color=purple>KICK</color><color=grey>]</color> Kicking {name}.");
             float time;
             RPCProtection();
-        kick:
+            kick:
             {
                 time = Time.time + 10f;
                 int view = PhotonNetwork.AllocateViewID(0);
@@ -6332,99 +6292,100 @@ namespace Seralyth.Mods
             kickCoroutine = null;
         }
 
-        public static IEnumerator KickAll()
+        public static IEnumerator KickTarget(Player player = null)
         {
-            ButtonInfo button = Buttons.GetIndex("Kick Master Client");
-
-            if (!NetworkSystem.Instance.InRoom)
-            {
-                NotificationManager.SendNotification("<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> You are not in a room.");
-                kickCoroutine = null;
+            if (!PhotonNetwork.InRoom)
                 yield break;
-            }
 
-            if (NetworkSystem.Instance.IsMasterClient)
-            {
-                kickCoroutine = null;
-                yield break;
-            }
+            bool kickingAll = false;
+            if (player == null)
+                kickingAll = true;
+
+            NotificationManager.SendNotification(player != null
+                ? $"<color=grey>[</color><color=purple>KICK</color><color=grey>]</color> Kicking {player.NickName}, please wait a bit.."
+                : $"<color=grey>[</color><color=purple>KICK</color><color=grey>]</color> Kicking everyone, please wait a bit..");
+
+            float time = Time.time;
+
+            FreezeServer(0, 40);
 
             SerializePatch.OverrideSerialization = () => false;
 
-            while (!PhotonNetwork.LocalPlayer.IsMasterClient)
+            float elapsed = 0f;
+            const float maxWait = 20f;
+
+            while (PhotonNetwork.InRoom)
             {
-                Player player = PhotonNetwork.MasterClient;
-                if (player == null)
-                    break;
+                elapsed = Time.time - time;
 
-                VRRig rig = GetVRRigFromPlayer(player);
-                string name = $"<color=#{(rig != null ? ColorUtility.ToHtmlStringRGBA(rig.GetColor()) : "white")}>{player.NickName}</color>";
+                float remaining = Mathf.Max(0f, maxWait - elapsed);
 
-                NotificationManager.SendNotification($"<color=grey>[</color><color=purple>KICK</color><color=grey>]</color> Kicking {name}.");
-                RPCProtection();
-                float time;
-            kick:
+                NotificationManager.information["Elapsed Kick Time"] =
+                    $"{Mathf.CeilToInt(elapsed)}s ({Mathf.CeilToInt(remaining)}s until I give up)";
+
+                if (elapsed > maxWait)
                 {
-                    time = Time.time + 10f;
-                    int view = PhotonNetwork.AllocateViewID(0);
-                    for (int i = 0; i < 3965; i++)
-                    {
-                        PhotonNetwork.NetworkingClient.OpRaiseEvent(202, new Hashtable
-                        {
-                            { 0, "GameMode" },
-                            { 6, PhotonNetwork.ServerTimestamp },
-                            { 7, PhotonNetwork.AllocateViewID(0) }
-                        }, new RaiseEventOptions
-                        {
-                            Receivers = ReceiverGroup.MasterClient
-                        }, SendOptions.SendReliable);
-                    }
-                }
+                    NotificationManager.SendNotification(player != null
+                        ? $"<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> Kicking {player.NickName} failed, please try again in another room!"
+                        : $"<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> Kick all failed, please try again in another room!");
 
-                while (PhotonNetwork.MasterClient == player)
-                {
-                    if (Time.time > time)
-                    {
-                        NotificationManager.SendNotification($"<color=grey>[</color><color=red>KICK</color><color=grey>]</color> Could not kick {name}, trying again..");
-                        yield return null;
-                        goto kick;
-                    }
-                    yield return null;
-                }
-
-                if (!PhotonNetwork.InRoom)
-                {
-                    NotificationManager.SendNotification($"<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> Kicking {name} failed. :(");
-                    kickCoroutine = null;
+                    Reset();
                     yield break;
                 }
 
-                int left = (Time.time - (time - 10f)) < 2.5f ? 10 : 5;
+                FriendshipGroupDetection.Instance.photonView.RPC("AddPartyMembers", player == null ? RpcTarget.Others : (object)player, serverLink.PadRight(540), (short)12, new int[] { }, null);
 
-                NotificationManager.SendNotification($"<color=grey>[</color><color=green>SUCCESS</color><color=grey>]</color> {name} has been kicked! Waiting {left} seconds to kick the next person..");
-                yield return new WaitForSeconds(left);
+                if ((!kickingAll && !PhotonNetwork.PlayerList.Contains(player)) || (kickingAll && PhotonNetwork.CurrentRoom.PlayerCount == 1))
+                {
+                    NotificationManager.SendNotification("<color=grey>[</color><color=purple>KICK</color><color=grey>]</color> Kicked " + (player != null ? player.NickName : "everyone") + " successfully!");
+                    PhotonNetwork.OpCleanRpcBuffer(VRRig.LocalRig.GetPhotonView());
+                    Reset();
+                    yield break;
+                }
 
+                yield return null;
             }
 
-            SerializePatch.OverrideSerialization = null;
+            if (!PhotonNetwork.InRoom)
+            {
+                NotificationManager.SendNotification("<color=grey>[</color><color=red>ERROR</color><color=grey>]</color> Stopped kicking because you are left the room.");
+                Reset();
+                yield break;
+            }
 
-            NotificationManager.SendNotification($"<color=grey>[</color><color=green>SUCCESS</color><color=grey>]</color> Kicked all successfully!");
 
-            kickCoroutine = null;
+            void Reset()
+            {
+                SerializePatch.OverrideSerialization = null;
+                RemoveElapsedKickTime();
+                kickCoroutine = null;
+                if (kickingAll)
+                    Buttons.GetIndex("Kick All").enabled = false;
+            }
+
+            void RemoveElapsedKickTime(bool success = false)
+            {
+                Task.Run(async () =>
+                {
+                    if (success)
+                    {
+                        NotificationManager.information["Elapsed Kick Time"] = $"Completed in {Mathf.CeilToInt(elapsed)}s seconds!";
+                        await Task.Delay(3000);
+                    }
+                    NotificationManager.information.Remove("Elapsed Kick Time");
+                });
+            }
         }
 
         public static void KickGun()
         {
-            if (NetworkSystem.Instance.InRoom)
-                VisualizeMasterClient();
-
             if (GetGunInput(false))
             {
                 var GunData = RenderGun();
                 RaycastHit Ray = GunData.Ray;
 
-                if (gunLocked && lockTarget != null && lockTarget.GetPlayer().IsMasterClient && kickCoroutine == null)
-                    kickCoroutine = CoroutineManager.instance.StartCoroutine(KickMasterClient());
+                if (gunLocked && lockTarget != null && kickCoroutine == null)
+                    kickCoroutine = CoroutineManager.instance.StartCoroutine(KickTarget(lockTarget.GetPhotonPlayer()));
 
                 if (GetGunInput(true))
                 {
@@ -6443,123 +6404,8 @@ namespace Seralyth.Mods
             }
         }
 
-        public static void CacheKickGun()
-        {
-            if (GetGunInput(false))
-            {
-                var GunData = RenderGun();
-                RaycastHit Ray = GunData.Ray;
-
-                if (gunLocked && lockTarget != null)
-                {
-                    if (!lockTarget.Active())
-                    {
-                        NotificationManager.SendNotification($"<color=grey>[</color><color=green>SUCCESS</color><color=grey>]</color> Kicked all successfully!");
-                        gunLocked = false;
-                        return;
-                    }
-
-                    FreezeServer(8.5f, 3950, new RaiseEventOptions
-                    {
-                        CachingOption = EventCaching.AddToRoomCache,
-                        TargetActors = new[] { lockTarget.GetPlayer().ActorNumber },
-                        Flags = new WebFlags(byte.MaxValue)
-                    });
-                }
-
-                if (GetGunInput(true))
-                {
-                    VRRig gunTarget = Ray.collider.GetComponentInParent<VRRig>();
-                    if (gunTarget && !gunTarget.IsLocal() && !gunLocked)
-                    {
-                        gunLocked = true;
-                        lockTarget = gunTarget;
-
-                        OptimizeEvents = true;
-                        string name = $"<color=#{(lockTarget != null ? ColorUtility.ToHtmlStringRGBA(lockTarget.GetColor()) : "white")}>{lockTarget.GetName()}</color>";
-                        NotificationManager.SendNotification($"<color=grey>[</color><color=purple>KICK</color><color=grey>]</color> Kicking {name}. This can take up to 2 minutes, please be patient.");
-                    }
-                }
-            }
-            else
-            {
-                if (gunLocked)
-                {
-                    gunLocked = false;
-                    OptimizeEvents = false;
-                }
-            }
-        }
-
-        public static void EnableCacheKickAll()
-        {
-            OptimizeEvents = true;
-            NotificationManager.SendNotification($"<color=grey>[</color><color=purple>KICK</color><color=grey>]</color> Kicking everyone. This can take up to 2 minutes, please be patient.");
-        }
-
-        public static void CacheKickAll() =>
-            FreezeServer(8.5f, 3950, new RaiseEventOptions
-            {
-                CachingOption = EventCaching.AddToRoomCache,
-                Receivers = ReceiverGroup.Others,
-                Flags = new WebFlags(byte.MaxValue)
-            });
-
-        public static float lagMasterDelay;
-
-        public static void LagMasterClient()
-        {
-            if (NetworkSystem.Instance.IsMasterClient || !NetworkSystem.Instance.InRoom)
-                return;
-
-            if (Time.time > lagMasterDelay)
-            {
-                int view = PhotonNetwork.AllocateViewID(0);
-                for (int i = 0; i < lagAmount; i++)
-                {
-                    PhotonNetwork.NetworkingClient.OpRaiseEvent(202, new Hashtable
-                    {
-                        { 0, "GameMode" },
-                        { 6, PhotonNetwork.ServerTimestamp },
-                        { 7, view }
-                    }, new RaiseEventOptions
-                    {
-                        Receivers = ReceiverGroup.MasterClient
-                    }, SendOptions.SendReliable);
-                }
-                lagMasterDelay = Time.time + lagDelay;
-            }
-        }
-
-        public static void LagMasterClientGun()
-        {
-            if (NetworkSystem.Instance.InRoom || !NetworkSystem.Instance.IsMasterClient)
-                VisualizeMasterClient();
-
-            if (GetGunInput(false))
-            {
-                var GunData = RenderGun();
-                RaycastHit Ray = GunData.Ray;
-
-                if (gunLocked && lockTarget != null && lockTarget.GetPlayer().IsMasterClient)
-                    LagMasterClient();
-
-                if (GetGunInput(true))
-                {
-                    VRRig gunTarget = Ray.collider.GetComponentInParent<VRRig>();
-                    if (gunTarget && !gunTarget.IsLocal())
-                    {
-                        gunLocked = true;
-                        lockTarget = gunTarget;
-                    }
-                }
-            }
-            else
-            {
-                if (gunLocked)
-                    gunLocked = false;
-            }
-        }
+        public static void KickAll() =>
+            kickCoroutine ??= CoroutineManager.instance.StartCoroutine(KickTarget(null));
 
         public static void CreatePeerBase()
         {
@@ -6793,7 +6639,7 @@ namespace Seralyth.Mods
 
                             SerializePatch.OverrideSerialization = () =>
                             {
-                                SendSerialize(GorillaTagger.Instance.myVRRig.GetView);
+                                SendSerialize(VRRig.LocalRig.GetPhotonView());
                                 return true;
                             };
                         }
@@ -6850,15 +6696,14 @@ namespace Seralyth.Mods
 
         public static void PartyKickAll()
         {
-            OptimizeEvents = true;
+            SerializePatch.OverrideSerialization = () => false;
 
             if (Time.time > kickDelay)
             {
                 kickDelay = Time.time + 10f;
-                for (int i = 0; i < 3970; i++)
-                    SpecialTargetRPC
+                for (int i = 0; i < 3950; i++)
+                    FriendshipGroupDetection.Instance.photonView.RPC
                     (
-                        FriendshipGroupDetection.Instance.photonView,
                         "RequestPartyGameMode",
                         new RaiseEventOptions
                         {
@@ -6892,7 +6737,7 @@ namespace Seralyth.Mods
 
             if (nearbyPlayers.Count > 0)
             {
-                OptimizeEvents = true;
+                SerializePatch.OverrideSerialization = () => false;
                 foreach (VRRig nearbyPlayer in nearbyPlayers)
                 {
                     for (int i = 0; i < 3950; i++)
@@ -6926,7 +6771,7 @@ namespace Seralyth.Mods
 
             if (touchedPlayers.Count > 0)
             {
-                OptimizeEvents = true;
+                SerializePatch.OverrideSerialization = () => false;
                 foreach (VRRig rig in touchedPlayers)
                 {
                     for (int i = 0; i < 3950; i++)
@@ -7071,8 +6916,16 @@ namespace Seralyth.Mods
         public static void DestroyPlayer(NetPlayer player) =>
             PhotonNetwork.OpRemoveCompleteCacheOfPlayer(player.ActorNumber);
 
-        public static void ChangeLavaState(InfectionLavaController.RisingLavaState state) =>
-            InfectionLavaController.ActiveControllers.FirstOrDefault().reliableState.state = state;
+        public static void ChangeLavaState(InfectionLavaController.RisingLavaState state)
+        {
+            InfectionLavaController controller = InfectionLavaController.ActiveControllers.FirstOrDefault();
+
+            if (controller != null)
+            {
+                controller.JumpToState(state);
+                controller.reliableState.stateStartTime = NetworkSystem.Instance.InRoom ? NetworkSystem.Instance.SimTime : Time.timeAsDouble;
+            }
+        }
 
         public static void TargetSpam()
         {
