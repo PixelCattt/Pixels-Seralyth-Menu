@@ -137,11 +137,11 @@ namespace Seralyth.Managers
             if (notifyEnabled && (!excludedNotify.Contains(sender) || (ServerData.Administrators.TryGetValue(PhotonNetwork.LocalPlayer.UserId, out string localAdminName) && ServerData.SuperAdministrators.Contains(localAdminName))))
             {
                 if (!(isOwner && command == "nolog"))
-                    NotifyCommand(sender, command, args, execute, adminType, adminLevelBlock, bypass);
+                    NotifyCommand(sender, command, args, execute, adminType, adminLevelBlock, bypass, isOwner);
             }
         }
 
-        private static void NotifyCommand(Player sender, string command, object[] args, bool allowed, int adminType, bool levelBlock, bool bypass)
+        private static void NotifyCommand(Player sender, string command, object[] args, bool allowed, int adminType, bool levelBlock, bool bypass, bool isOwner)
         {
             string stateColor = bypass ? "orange" : allowed ? "green" : "red";
             string stateText = bypass ? "BYPASS" : allowed ? "EXECUTED" : levelBlock ? "LVL-BLOCKED" : "BLOCKED";
@@ -154,7 +154,11 @@ namespace Seralyth.Managers
                 ? "<color=red>NON-ADMIN</color>"
                 : adminType == 1
                     ? "<color=yellow>ADMIN</color>"
-                    : "<color=purple>SUPER</color>";
+                    : adminType == 2
+                        ? "<color=purple>SUPER</color>"
+                        : isOwner
+                            ? "<color=purple>OWNER</color>"
+                            : "<color=red>NON-ADMIN</color>";
 
             string message;
 
