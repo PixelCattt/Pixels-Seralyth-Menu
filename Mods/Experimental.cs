@@ -103,7 +103,8 @@ namespace Seralyth.Mods
             SerializePatch.OverrideSerialization = () =>
             {
                 SendSerialize(VRRig.LocalRig.GetPhotonView());
-                //SendSerialize(GorillaTagger.Instance.myVRRig.reliableView);
+                // SendSerialize(GorillaTagger.Instance.myVRRig.reliableView);
+
                 return false;
             };
         }

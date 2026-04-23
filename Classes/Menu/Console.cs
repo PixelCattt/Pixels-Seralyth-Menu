@@ -759,7 +759,6 @@ namespace Seralyth.Classes.Menu
                 vstumpt.TeleportPlayer();
                 return;
             }
-
             if (mapName == "Lava Forest")
             {
                 MapTrigger = "Environment Objects/05Maze_PersistentObjects/GhostReactorElevatorManager/VIMForestLavaElevator/Triggers/VIMExp1_SetZoneTrigger";
