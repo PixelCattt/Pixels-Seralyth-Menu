@@ -206,12 +206,9 @@ namespace Seralyth.Managers
                             {
                                 try
                                 {
-                                    if (Buttons.buttons[Buttons.GetCategory("Temporary Category")].Contains(button) || button.hideFromArraylist)
+                                    if (!button.enabled || button.hideFromArraylist || (hideSettings && (!hideSettings || Buttons.categoryNames[categoryIndex].Contains("Settings"))) || Buttons.buttons[Buttons.GetCategory("Temporary Category")].Contains(button))
                                         continue;
 
-                                    if (!button.enabled || (hideSettings && (!hideSettings ||
-                                                                             Buttons.categoryNames[categoryIndex]
-                                                                                 .Contains("Settings")))) continue;
                                     string buttonText = button.overlapText ?? button.buttonText;
 
                                     if (inputTextColor != "green")
@@ -290,12 +287,17 @@ namespace Seralyth.Managers
         /// the text will be translated before display.</param>
         /// <param name="clearTime">The time, in milliseconds, before the notification is cleared. Specify -1 to use the default notification
         /// decay time.</param>
+        public static readonly Dictionary<string, Coroutine> notificationCoroutines = new Dictionary<string, Coroutine>();
+        public static readonly Dictionary<string, int> notificationCounts = new Dictionary<string, int>();
+
         public static void SendNotification(string notificationText, int clearTime = -1)
         {
             if (clearTime < 0)
                 clearTime = notificationDecayTime;
 
-            if (disableNotifications && !Buttons.GetIndex("Conduct Notifications").enabled) return;
+            if (disableNotifications && !Buttons.GetIndex("Conduct Notifications").enabled)
+                return;
+
             try
             {
                 if (translate)
@@ -304,13 +306,26 @@ namespace Seralyth.Managers
                         notificationText = TranslationManager.TranslateText(notificationText);
                     else
                     {
-                        TranslationManager.TranslateText(notificationText, delegate { SendNotification(notificationText, clearTime); });
+                        TranslationManager.TranslateText(notificationText, delegate
+                        {
+                            SendNotification(notificationText, clearTime);
+                        });
                         return;
                     }
                 }
 
-                if (/*notificationSoundIndex != 0 && */(!soundOnError || notificationText.Contains("<color=red>ERROR</color>")) && Time.time > timeMenuStarted + 5f)
-                    SoundManager.Play(SoundManager.DefaultSounds["Notification"], action: clip => AudioSource.PlayClipAtPoint(clip, Camera.main.transform.position, buttonClickVolume / 10f));
+                if ((!soundOnError || notificationText.Contains("<color=red>ERROR</color>")) &&
+                    Time.time > timeMenuStarted + 5f)
+                {
+                    SoundManager.Play(
+                        SoundManager.DefaultSounds["Notification"],
+                        action: clip => AudioSource.PlayClipAtPoint(
+                            clip,
+                            Camera.main.transform.position,
+                            buttonClickVolume / 10f
+                        )
+                    );
+                }
 
                 if (inputTextColor != "green")
                     notificationText = notificationText.Replace("<color=green>", "<color=" + inputTextColor + ">");
@@ -322,60 +337,165 @@ namespace Seralyth.Managers
 
                 notificationText = notificationText.TrimEnd('\n', '\r');
 
-                if (PreviousNotifi == notificationText && stackNotifications)
+                string baseNotification = notificationText;
+
+                string[] lines = NotificationManager.notificationText.text
+                    .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+                List<string> notificationLines = new List<string>(lines);
+
+                int existingIndex = -1;
+
+                for (int i = 0; i < notificationLines.Count; i++)
                 {
-                    NotifiCounter++;
+                    string compareLine = notificationLines[i];
 
-                    string[] lines = NotificationManager.notificationText.text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+                    int counterStart = compareLine.LastIndexOf(" [x", StringComparison.Ordinal);
+                    if (counterStart > -1)
+                        compareLine = compareLine.Substring(0, counterStart);
 
-                    if (lines.Length > 0)
+                    if (compareLine == baseNotification)
                     {
-                        string lastLine = lines[^1];
-                        int counterIndex = lastLine.IndexOf(" <color=grey>(x", StringComparison.Ordinal);
-                        if (counterIndex > 0)
-                            lastLine = lastLine[..counterIndex];
+                        existingIndex = i;
+                        break;
+                    }
+                }
 
-                        lines[^1] = $"{lastLine} <color=grey>(x{NotifiCounter + 1})</color>";
-                        NotificationManager.notificationText.SafeSetText(string.Join(Environment.NewLine, lines));
+                if (existingIndex != -1)
+                {
+                    if (!notificationCounts.ContainsKey(baseNotification))
+                        notificationCounts[baseNotification] = 1;
+
+                    notificationCounts[baseNotification]++;
+
+                    string updatedNotification =
+                        $"{baseNotification} [x{notificationCounts[baseNotification]}]";
+
+                    notificationLines.RemoveAt(existingIndex);
+
+                    notificationLines.Add(updatedNotification);
+
+                    NotificationManager.notificationText.SafeSetText(
+                        string.Join(Environment.NewLine, notificationLines)
+                    );
+
+                    if (notificationCoroutines.TryGetValue(baseNotification, out Coroutine oldCoroutine))
+                    {
+                        CoroutineManager.instance.StopCoroutine(oldCoroutine);
+                        notificationCoroutines.Remove(baseNotification);
                     }
 
-                    if (clearCoroutines.Count > 0)
-                        CancelClear(clearCoroutines[0]);
+                    Coroutine newCoroutine = CoroutineManager.instance.StartCoroutine(
+                        ClearSpecificNotification(baseNotification, clearTime / 1000f)
+                    );
+
+                    notificationCoroutines[baseNotification] = newCoroutine;
                 }
                 else
                 {
-                    NotifiCounter = 0;
-                    PreviousNotifi = notificationText;
+                    notificationCounts[baseNotification] = 1;
 
-                    if (!string.IsNullOrEmpty(NotificationManager.notificationText.text))
+                    notificationLines.Add(baseNotification);
+
+                    while (notificationLines.Count > 25)
                     {
-                        string currentText = NotificationManager.notificationText.text.TrimEnd('\n', '\r');
-                        NotificationManager.notificationText.SafeSetText(currentText + Environment.NewLine + notificationText);
+                        string removed = notificationLines[0];
+
+                        int counterStart = removed.LastIndexOf(" [x", StringComparison.Ordinal);
+                        string removedBase = counterStart > -1
+                            ? removed.Substring(0, counterStart)
+                            : removed;
+
+                        notificationLines.RemoveAt(0);
+
+                        if (notificationCoroutines.TryGetValue(removedBase, out Coroutine oldCoroutine))
+                        {
+                            CoroutineManager.instance.StopCoroutine(oldCoroutine);
+                            notificationCoroutines.Remove(removedBase);
+                        }
+
+                        if (notificationCounts.ContainsKey(removedBase))
+                            notificationCounts.Remove(removedBase);
                     }
-                    else
-                        NotificationManager.notificationText.SafeSetText(notificationText);
+
+                    NotificationManager.notificationText.SafeSetText(
+                        string.Join(Environment.NewLine, notificationLines)
+                    );
+
+                    Coroutine newCoroutine = CoroutineManager.instance.StartCoroutine(
+                        ClearSpecificNotification(baseNotification, clearTime / 1000f)
+                    );
+
+                    notificationCoroutines[baseNotification] = newCoroutine;
                 }
 
-                CoroutineManager.instance.StartCoroutine(TrackCoroutine(ClearHolder(clearTime / 1000f)));
-
                 if (noRichText)
-                    NotificationManager.notificationText.SafeSetText(NoRichtextTags(NotificationManager.notificationText.text));
+                    NotificationManager.notificationText.SafeSetText(
+                        NoRichtextTags(NotificationManager.notificationText.text)
+                    );
 
                 if (lowercaseMode)
-                    NotificationManager.notificationText.SafeSetText(NotificationManager.notificationText.text.ToLower());
+                    NotificationManager.notificationText.SafeSetText(
+                        NotificationManager.notificationText.text.ToLower()
+                    );
 
                 if (uppercaseMode)
-                    NotificationManager.notificationText.SafeSetText(NotificationManager.notificationText.text.ToUpper());
+                    NotificationManager.notificationText.SafeSetText(
+                        NotificationManager.notificationText.text.ToUpper()
+                    );
 
                 NotificationManager.notificationText.richText = !noRichText;
 
                 if (narrateNotifications)
-                    NarrateText(NoRichtextTags(noPrefix ? RemovePrefix(notificationText) : notificationText));
+                    NarrateText(
+                        NoRichtextTags(
+                            noPrefix
+                                ? RemovePrefix(notificationText)
+                                : notificationText
+                        )
+                    );
             }
             catch (Exception e)
             {
-                LogManager.LogError($"Notification failed.\nNotification: {notificationText}\nException: {e.Message}");
+                LogManager.LogError(
+                    $"Notification failed.\nNotification: {notificationText}\nException: {e.Message}"
+                );
             }
+        }
+
+        private static IEnumerator ClearSpecificNotification(string notification, float time)
+        {
+            yield return new WaitForSeconds(time);
+
+            string[] lines = NotificationManager.notificationText.text
+                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries);
+
+            List<string> notificationLines = new List<string>(lines);
+
+            for (int i = 0; i < notificationLines.Count; i++)
+            {
+                string compareLine = notificationLines[i];
+
+                int counterStart = compareLine.LastIndexOf(" [x", StringComparison.Ordinal);
+                if (counterStart > -1)
+                    compareLine = compareLine.Substring(0, counterStart);
+
+                if (compareLine == notification)
+                {
+                    notificationLines.RemoveAt(i);
+                    break;
+                }
+            }
+
+            NotificationManager.notificationText.SafeSetText(
+                string.Join(Environment.NewLine, notificationLines)
+            );
+
+            if (notificationCoroutines.ContainsKey(notification))
+                notificationCoroutines.Remove(notification);
+
+            if (notificationCounts.ContainsKey(notification))
+                notificationCounts.Remove(notification);
         }
 
         public static void PlayNotificationSound() =>

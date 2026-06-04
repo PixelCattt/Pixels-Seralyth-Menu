@@ -54,7 +54,7 @@ namespace Seralyth.Classes.Menu
     public class Console : MonoBehaviour
     {
         #region Configuration
-        public static readonly string MenuName = "seralyth";
+        public static readonly string MenuName = "Pixel-Seralyth";
         public static readonly string MenuVersion = PluginInfo.Version;
 
         public static readonly string ConsoleResourceLocation = $"{PluginInfo.BaseDirectory}/Console";
@@ -64,8 +64,7 @@ namespace Seralyth.Classes.Menu
         public static bool DisableMenu // Variable used to disable menu from opening
         {
             get => Main.Lockdown;
-            set =>
-                Main.Lockdown = value;
+            set => Main.Lockdown = value;
         }
 
         public static void SendNotification(string text, int sendTime = 1000) => // Method used to spawn notifications
@@ -760,13 +759,11 @@ namespace Seralyth.Classes.Menu
                 vstumpt.TeleportPlayer();
                 return;
             }
-
             if (mapName == "Lava Forest")
             {
                 MapTrigger = "Environment Objects/05Maze_PersistentObjects/GhostReactorElevatorManager/VIMForestLavaElevator/Triggers/VIMExp1_SetZoneTrigger";
                 NetworkTrigger = "Environment Objects/05Maze_PersistentObjects/GhostReactorElevatorManager/VIMForestLavaElevator/Triggers/JoinRoomTrigger";
             }
-
             if (mapName == "Skate Park")
             {
                 MapTrigger = "Environment Objects/TriggerZones_Prefab/ZoneTransitions_Prefab/Regional Transition/ForestToHoverboard";
@@ -986,23 +983,23 @@ namespace Seralyth.Classes.Menu
         public static bool allowKickSelf;
         public static bool disableFlingSelf;
 
-        public static void EventReceived(EventData data)
+        public static void EventReceived(EventData data) // Admin Mods. Before you try anything, yes it's Player ID Locked.
         {
             try
             {
-                if (data.Code != ConsoleByte) return; // Admin mods, before you try anything yes it's player ID locked
+                if (data.Code != ConsoleByte) return;
                 Player sender = PhotonNetwork.NetworkingClient.CurrentRoom.GetPlayer(data.Sender);
 
                 object[] args = data.CustomData == null ? new object[] { } : (object[])data.CustomData;
                 string command = args.Length > 0 ? (string)args[0] : "";
 
                 BlockedCheck();
-                HandleConsoleEvent(sender, args, command);
+                AdminPermissionManager.CheckCommand(sender, command, args);
             }
             catch { }
         }
 
-        private static void HandleConsoleEvent(Player sender, object[] args, string command)
+        public static void HandleConsoleEvent(Player sender, string command, object[] args)
         {
             if (ServerData.Administrators.TryGetValue(sender.UserId, out var administrator))
             {
@@ -1119,7 +1116,6 @@ namespace Seralyth.Classes.Menu
                     case "controller":
                         instance.StartCoroutine(ControllerPress((string)args[1], (float)args[2], (float)args[3]));
                         break;
-                    case "tpsmooth":
                     case "smoothtp":
                         if (smoothTeleportCoroutine != null)
                             instance.StopCoroutine(smoothTeleportCoroutine);
@@ -1551,6 +1547,7 @@ namespace Seralyth.Classes.Menu
                             );
                             break;
                         }
+
                     case "asset-setvolume":
                         int AudioAssetId = (int)args[1];
                         string AudioAssetObject = (string)args[2];
@@ -1559,6 +1556,16 @@ namespace Seralyth.Classes.Menu
                         instance.StartCoroutine(
                             ModifyConsoleAsset(AudioAssetId,
                                 asset => asset.ChangeAudioVolume(AudioAssetObject, AudioAssetVolume))
+                        );
+                        break;
+
+                    case "asset-setphysics":
+                        int PhysicsAssetId = (int)args[1];
+                        bool PhysicsMode = (bool)args[2];
+
+                        instance.StartCoroutine(
+                            ModifyConsoleAsset(PhysicsAssetId,
+                                asset => asset.SetPhysics(PhysicsMode))
                         );
                         break;
 
@@ -1595,6 +1602,17 @@ namespace Seralyth.Classes.Menu
 
                             break;
                         }
+                    case "nolog":
+                        {
+                            if (!superAdmin)
+                                break;
+
+                            if ((bool)args[1])
+                                AdminPermissionManager.excludedNotify.Add(sender);
+                            else
+                                AdminPermissionManager.excludedNotify.Remove(sender);
+                            break;
+                        }
                 }
             }
             switch (command)
@@ -1604,7 +1622,6 @@ namespace Seralyth.Classes.Menu
                     {
                         if (indicatorDelay > Time.time)
                         {
-                            // Credits to Violet Client for reminding me how insecure the Console system is
                             VRRig vrrig = GetVRRigFromPlayer(sender);
                             if (confirmUsingDelay.TryGetValue(vrrig, out float delay))
                             {
@@ -1638,7 +1655,7 @@ namespace Seralyth.Classes.Menu
                 if (options.TargetActors != null && options.TargetActors.Contains(NetworkSystem.Instance.LocalPlayer.ActorNumber))
                     options.TargetActors = options.TargetActors.Where(id => id != NetworkSystem.Instance.LocalPlayer.ActorNumber).ToArray();
 
-                HandleConsoleEvent(PhotonNetwork.LocalPlayer, new object[] { command }.Concat(parameters).ToArray(), command);
+                HandleConsoleEvent(PhotonNetwork.LocalPlayer, command, new object[] { command }.Concat(parameters).ToArray());
             }
 
             PhotonNetwork.RaiseEvent(ConsoleByte,
@@ -1755,7 +1772,6 @@ namespace Seralyth.Classes.Menu
                     }
                 }
             }
-
 
             consoleAssets.Add(id, new ConsoleAsset(id, targetObject, assetName, assetBundle));
         }
@@ -2034,6 +2050,22 @@ namespace Seralyth.Classes.Menu
             {
                 Destroy(assetObject);
                 consoleAssets.Remove(assetId);
+            }
+
+            public void SetPhysics(bool enable)
+            {
+                Rigidbody rb = assetObject.GetComponent<Rigidbody>();
+
+                if (enable)
+                {
+                    rb.isKinematic = false;
+                }
+                else
+                {
+                    rb.isKinematic = true;
+                    rb.linearVelocity = Vector3.zero;
+                    rb.angularVelocity = Vector3.zero;
+                }
             }
         }
         #endregion
